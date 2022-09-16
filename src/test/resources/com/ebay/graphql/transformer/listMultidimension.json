@@ -1,0 +1,9 @@
+{
+	"type": ["array", "null"],
+	"items": {
+		"type": ["array", "null"],
+		"items": {
+			"type": ["string", "null"]
+		}
+	}
+}

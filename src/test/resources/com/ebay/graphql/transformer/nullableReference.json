@@ -1,0 +1,11 @@
+{
+	"type": ["object", "null"],
+	"properties": {
+		"name": {
+			"type": ["string", "null"]
+		},
+		"age": {
+			"type": ["integer", "null"]
+		}
+	}
+}

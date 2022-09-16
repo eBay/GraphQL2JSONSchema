@@ -1,0 +1,16 @@
+{
+	"type": ["object", "null"],
+	"properties": {
+		"name": {
+			"type": ["object", "null"],
+			"properties": {
+				"first": {
+					"type": "string"
+				},
+				"last": {
+					"type": "string"
+				}
+			}
+		}
+	}
+}

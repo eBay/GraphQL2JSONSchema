@@ -1,0 +1,11 @@
+{
+	"type": ["array", "null"],
+	"items": {
+		"type": ["object", "null"],
+		"properties": {
+			"name": {
+				"type": ["string", "null"]
+			}
+		}
+	}
+}

@@ -1,0 +1,6 @@
+{
+	"type": ["array", "null"],
+	"items": {
+		"type": ["boolean", "null"]
+	}
+}

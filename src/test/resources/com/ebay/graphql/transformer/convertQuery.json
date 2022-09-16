@@ -1,0 +1,20 @@
+{
+	"type": ["object", "null"],
+	"properties": {
+		"enrollmentStatus": {
+			"enum": ["ENROLLED", "NOT_ENROLLED"]
+		},
+		"didUserPassRISK": {
+			"type": ["boolean", "null"]
+		},
+		"enrollmentTime": {
+			"type": ["string", "null"]
+		},
+		"enrollmentLocales": {
+			"type": ["array", "null"],
+			"items": {
+				"type": ["string", "null"]
+			}
+		}
+	}
+}		
