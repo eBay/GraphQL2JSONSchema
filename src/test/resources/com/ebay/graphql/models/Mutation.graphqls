@@ -1,0 +1,11 @@
+extend type Mutation {
+    # external
+    "Pre-enroll eBay user into vault"
+    preEnrollVaultUser: VaultPreEnrollmentOutput
+    # external
+    "Complete eBay user into vault enrollment"
+    completeVaultUserEnrollment(completeVaultUserInput: CompleteVaultUserInput): VaultEnrollmentOutput
+    # internal
+    "Un-enrolling eBay user from vault enrollment"
+    unEnrollVaultUser: VaultEnrollmentStatusOutput
+}

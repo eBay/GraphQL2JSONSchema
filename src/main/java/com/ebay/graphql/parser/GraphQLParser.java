@@ -17,21 +17,55 @@ import com.ebay.graphql.types.GraphQLType;
 import com.ebay.graphql.types.FieldKeyValuePair;
 
 public class GraphQLParser {
-	
+
 	private static final String IMPLEMENTS_KEYWORD = " implements ";
 
 	public GraphQLSchema parseGraphQL(File schemaFile) {
 
-		GraphQLSchema schema = new GraphQLSchema();
+		GraphQLSchema completeSchema = new GraphQLSchema();
 
 		if (schemaFile == null || !schemaFile.exists()) {
-			return schema;
+			return completeSchema;
 		}
 
-		GraphQLFile graphQLFile = new GraphQLFile(schemaFile);
-		schema = processLinesOfText(graphQLFile);
+		// Check folder containing schema file for other graphql schema definitions to
+		// load to complete the schema.
+		if (schemaFile.isFile()) {
+			schemaFile = schemaFile.getParentFile();
+		}
+		List<File> schemaFiles = getGraphQLSchemaFiles(schemaFile);
 
-		return schema;
+		GraphQLSchema schema;
+		for (File file : schemaFiles) {
+			GraphQLFile graphQLFile = new GraphQLFile(file);
+			schema = processLinesOfText(graphQLFile);
+			completeSchema.addSchema(schema);
+		}
+
+		return completeSchema;
+	}
+	
+	protected final List<File> getGraphQLSchemaFiles(File directory) {
+		
+		List<File> graphQLSchemaFiles = new ArrayList<>();
+		
+		if (!directory.isDirectory()) {
+			graphQLSchemaFiles.add(directory);
+			return graphQLSchemaFiles;
+		}
+		
+		File[] files = directory.listFiles();
+		if (files != null) {
+			for (File file : files) {
+				if (file.isDirectory()) {
+					graphQLSchemaFiles.addAll(getGraphQLSchemaFiles(file));
+				} else {
+					graphQLSchemaFiles.add(file);
+				}
+			}
+		}
+		
+		return graphQLSchemaFiles;
 	}
 
 	protected final GraphQLSchema processLinesOfText(GraphQLFile graphQLFile) {
@@ -181,7 +215,7 @@ public class GraphQLParser {
 	}
 
 	protected final void processSubscription(GraphQLFile graphQLFile, GraphQLSchema schema) throws ParseException {
-		
+
 		FieldKeyValuePair kvp;
 		String line = graphQLFile.getCurrentLine();
 		while (GraphQLMatcher.getLineType(line) != LineType.CLOSING_CURLY_BRACE && line != null) {
@@ -195,12 +229,12 @@ public class GraphQLParser {
 		String objectName = graphQLFile.getCurrentLine();
 		objectName = objectName.replace("type", "");
 		objectName = objectName.replace("{", "");
-		
+
 		// Drop the interface if it exists
 		if (objectName.contains(IMPLEMENTS_KEYWORD)) {
 			objectName = objectName.substring(0, objectName.indexOf(IMPLEMENTS_KEYWORD));
 		}
-		
+
 		objectName = objectName.trim();
 
 		GraphQLObject graphQLObject = new GraphQLObject();
@@ -208,21 +242,22 @@ public class GraphQLParser {
 		FieldKeyValuePair kvp;
 		String line;
 		boolean nullable = true;
-		while (GraphQLMatcher.getLineType(line = graphQLFile.getNextLine()) != LineType.CLOSING_CURLY_BRACE && line != null) {
-			
+		while (GraphQLMatcher.getLineType(line = graphQLFile.getNextLine()) != LineType.CLOSING_CURLY_BRACE
+				&& line != null) {
+
 			nullable = true;
-			
+
 			if (canIgnoreLine(line)) {
 				continue;
 			}
-			
+
 			line = line.trim();
-			
+
 			if (line.endsWith("!")) {
 				nullable = false;
-				line = line.substring(0, line.length()-1);
+				line = line.substring(0, line.length() - 1);
 			}
-			
+
 			kvp = new FieldKeyValuePair(line);
 			GraphQLType value = kvp.getValue();
 			if (!nullable) {
@@ -287,13 +322,14 @@ public class GraphQLParser {
 		GraphQLEnum graphQLEnum = new GraphQLEnum();
 
 		String line;
-		while (GraphQLMatcher.getLineType(line = graphQLFile.getNextLine()) != LineType.CLOSING_CURLY_BRACE && line != null) {
+		while (GraphQLMatcher.getLineType(line = graphQLFile.getNextLine()) != LineType.CLOSING_CURLY_BRACE
+				&& line != null) {
 
 			line = line.trim();
 			if (!Pattern.matches("^([A-Za-z0-9_]*)$", line)) {
 				continue;
 			}
-			
+
 			graphQLEnum.addEnumValue(line);
 		}
 
@@ -315,13 +351,14 @@ public class GraphQLParser {
 		String line;
 		boolean insideParameterList = false;
 
-		while (GraphQLMatcher.getLineType(line = graphQLFile.getNextLine()) != LineType.CLOSING_CURLY_BRACE && line != null) {
+		while (GraphQLMatcher.getLineType(line = graphQLFile.getNextLine()) != LineType.CLOSING_CURLY_BRACE
+				&& line != null) {
 
 			// Skip the line that is the opening definition for a schema definition.
 			if (line.contains("{")) {
 				continue;
 			}
-			
+
 			lineType = GraphQLMatcher.getLineType(line);
 			if (lineType == LineType.COMMENT || lineType == LineType.SINGLE_LINE_DESCRIPTION
 					|| lineType == LineType.MULTI_LINE_DESCRIPTION_IN_ONE_LINE) {
@@ -334,23 +371,24 @@ public class GraphQLParser {
 				}
 				continue;
 			}
-			
+
 			if (line.contains("(")) {
 				insideParameterList = true;
 			}
-			
+
 			// DO NOT combine this with the above check as an 'else if'.
-			// This allows us to handle the case where the parameter list is defined in a single line.
+			// This allows us to handle the case where the parameter list is defined in a
+			// single line.
 			if (line.contains(")")) {
 				insideParameterList = false;
 			}
-			
+
 			if (queryBuilder.length() > 0 && !line.isEmpty()) {
 				queryBuilder.append(" ");
 			}
 
 			queryBuilder.append(line.trim());
-			
+
 			// When we find a line with a ':' outside the parameter set we have found the
 			// type definition and can consider the operation API parsed.
 			if (!insideParameterList && line.contains(":")) {
@@ -360,9 +398,9 @@ public class GraphQLParser {
 
 		return new FieldKeyValuePair(queryBuilder.toString());
 	}
-	
+
 	private boolean canIgnoreLine(String line) {
-		
+
 		switch (GraphQLMatcher.getLineType(line)) {
 		case COMMENT:
 		case SINGLE_LINE_DESCRIPTION:

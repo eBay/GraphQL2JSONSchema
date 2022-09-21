@@ -1,0 +1,5 @@
+extend type Query {
+    # [internal] Check if the eBay user is enrolled into vault.
+    "Check if the eBay user is enrolled into vault"
+    isVaultUserEnrolled(vaultUserEnrolledInput: VaultUserEnrolledInput): VaultEnrollmentStatusOutput
+}

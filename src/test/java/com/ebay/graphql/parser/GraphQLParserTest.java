@@ -438,6 +438,54 @@ public class GraphQLParserTest {
 		// Compare
 		assertThat(actualSchema, is(equalTo(expectedSchema)));
 	}
+	
+	@Test
+	public void vaultEnrollmentGraphQLFromMultipleSchemaFragments() throws IOException, URISyntaxException {
+
+		File file = getGraphQLResourceFile("com/ebay/graphql/models/schema.graphqls");
+		GraphQLSchema actualSchema = parser.parseGraphQL(file);
+		
+		// Define the expected parsed schema
+		GraphQLSchema expectedSchema = new GraphQLSchema();
+		expectedSchema.addQuery("isVaultUserEnrolled(vaultUserEnrolledInput: VaultUserEnrolledInput)", new GraphQLReference("VaultEnrollmentStatusOutput"));
+		expectedSchema.addMutation("preEnrollVaultUser", new GraphQLReference("VaultPreEnrollmentOutput"));
+		expectedSchema.addMutation("completeVaultUserEnrollment(completeVaultUserInput: CompleteVaultUserInput)", new GraphQLReference("VaultEnrollmentOutput"));
+		expectedSchema.addMutation("unEnrollVaultUser", new GraphQLReference("VaultEnrollmentStatusOutput"));
+		
+		GraphQLObject vaultEnrollmentStatusOutput = new GraphQLObject();
+		GraphQLReference enrollmentStatus = new GraphQLReference("EnrollmentStatusEnum");
+		enrollmentStatus.makeNonNullable(); // Non nullable in all references - used in vaultPreEnrollmentOutput too.
+		vaultEnrollmentStatusOutput.addField("enrollmentStatus", enrollmentStatus);
+		vaultEnrollmentStatusOutput.addField("didUserPassRISK", new GraphQLScalar(GraphQLScalarValue.BOOLEAN));
+		vaultEnrollmentStatusOutput.addField("enrollmentTime", new GraphQLScalar(GraphQLScalarValue.STRING));
+		vaultEnrollmentStatusOutput.addField("enrollmentLocales", new GraphQLList(new GraphQLScalar(GraphQLScalarValue.STRING), Dimensionality.SINGLE));
+		
+		expectedSchema.addType("VaultEnrollmentStatusOutput", vaultEnrollmentStatusOutput);
+
+		GraphQLObject vaultPreEnrollmentOutput = new GraphQLObject();
+		vaultPreEnrollmentOutput.addField("enrollmentStatus", enrollmentStatus);
+		vaultPreEnrollmentOutput.addField("preEnrolled", new GraphQLScalar(GraphQLScalarValue.BOOLEAN));
+		vaultPreEnrollmentOutput.addField("refId", new GraphQLScalar(GraphQLScalarValue.ID));
+		vaultPreEnrollmentOutput.addField("stepUpUrl", new GraphQLScalar(GraphQLScalarValue.STRING));
+		
+		expectedSchema.addType("VaultPreEnrollmentOutput", vaultPreEnrollmentOutput);
+		
+		GraphQLObject vaultEnrollmentOutput = new GraphQLObject();
+		vaultEnrollmentOutput.addField("enrollmentStatus", enrollmentStatus);
+		vaultEnrollmentOutput.addField("preEnrolled", new GraphQLScalar(GraphQLScalarValue.BOOLEAN));
+		vaultEnrollmentOutput.addField("userAuthenticated", new GraphQLScalar(GraphQLScalarValue.BOOLEAN));
+		
+		expectedSchema.addType("VaultEnrollmentOutput", vaultEnrollmentOutput);
+		
+		GraphQLEnum enrollmentStatusEnum = new GraphQLEnum();
+		enrollmentStatusEnum.addEnumValue("ENROLLED");
+		enrollmentStatusEnum.addEnumValue("NOT_ENROLLED");
+		
+		expectedSchema.addType("EnrollmentStatusEnum", enrollmentStatusEnum);
+	
+		// Compare
+		assertThat(actualSchema, is(equalTo(expectedSchema)));
+	}
 
 	// -------------------------------------------
 	// Helper methods for generating GraphQLFiles.

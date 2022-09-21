@@ -1,0 +1,43 @@
+# Output for isVaultUserEnrolled
+"Output type for isVaultUserEnrolled"
+type VaultEnrollmentStatusOutput {
+    "current enrollment status of vault user"
+    enrollmentStatus: EnrollmentStatusEnum!
+    "has vault user successfully passed risk checks"
+    didUserPassRISK: Boolean
+    "time of user's enrollment into vault"
+    enrollmentTime: String
+    "sites where user is enrolled into eBay Vault"
+    enrollmentLocales: [String]
+}
+
+"Output type for vault pre-enrollment"
+type VaultPreEnrollmentOutput implements VaultToken {
+    "current enrollment status of vault user"
+    enrollmentStatus: EnrollmentStatusEnum!
+    "is the user preEnrolled into Vault"
+    preEnrolled: Boolean
+    "referenceId for Identity"
+    refId: ID
+    "Identity URL for web"
+    stepUpUrl: String
+}
+
+"Output type for vault enrollment"
+type VaultEnrollmentOutput implements VaultToken{
+    "current enrollment status of vault user"
+    enrollmentStatus: EnrollmentStatusEnum!
+    "is the user preEnrolled into Vault"
+    preEnrolled: Boolean
+    "is the user fully authenticated for vault enrollment"
+    userAuthenticated: Boolean
+}
+
+# Vault user enrollment statuses
+"""Possibles statuses of a Enrollment for a given user"""
+enum EnrollmentStatusEnum {
+    """User status is enrolled"""
+    ENROLLED
+    """User status is not enrolled"""
+    NOT_ENROLLED
+}
