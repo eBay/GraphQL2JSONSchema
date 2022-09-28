@@ -1,0 +1,11 @@
+extend type Mutation {
+    # external
+    "Pre-enroll"
+    preEnroll: PreEnrollmentOutput
+    # external
+    "Complete enrollment"
+    completeEnrollment(completeInput: CompleteInput): EnrollmentOutput
+    # internal
+    "Un-enrolling enrollment"
+    unEnroll: EnrollmentStatusOutput
+}

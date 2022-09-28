@@ -1,0 +1,17 @@
+# Input for CompleteEnrollment Mutation
+"Input for CompleteEnrollment Mutation"
+input CompleteInput {
+    "referenceId for Identity"
+    refId: ID!
+}
+
+# Input for IsEnrolled
+"Input for IsEnrolled Mutation"
+input EnrolledInput {
+    "legacyUserId of user"
+    userId: ID
+    "siteId"
+    siteId: Int
+    "check status at account level if set to true"
+    accountLevelEnrollment: Boolean!
+}

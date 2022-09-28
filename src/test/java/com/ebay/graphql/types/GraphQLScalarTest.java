@@ -3,6 +3,7 @@ package com.ebay.graphql.types;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -21,7 +22,6 @@ public class GraphQLScalarTest {
 			{ "String", GraphQLScalarValue.STRING },
 			{ "int", GraphQLScalarValue.INT },
 			{ "INT", GraphQLScalarValue.INT },
-			{ "Foo", null },
 		};
 	}
 	
@@ -29,6 +29,12 @@ public class GraphQLScalarTest {
 	public void testScalarValueToEnumConversion(String value, GraphQLScalarValue expectedScalar) {
 		GraphQLScalarValue actualScalar = GraphQLScalarValue.getScalarValueFromString(value);
 		assertThat(actualScalar, is(equalTo(expectedScalar)));
+	}
+	
+	@Test
+	public void testUnknownScalarType() {
+		GraphQLScalarValue actualScalar = GraphQLScalarValue.getScalarValueFromString("Foo");
+		assertThat(actualScalar, is(nullValue()));
 	}
 	
 	@DataProvider(name = "scalarTestStringValues")

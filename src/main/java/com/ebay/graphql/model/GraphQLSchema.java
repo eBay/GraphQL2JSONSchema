@@ -24,6 +24,34 @@ public class GraphQLSchema {
 
 	// Tracks union definitions in the schema.
 	private Map<String, List<String>> unions = new HashMap<>();
+	
+	public void addSchema(GraphQLSchema schema) {
+		
+		Map<String, GraphQLType> mutations = schema.getMutations();
+		for (Map.Entry<String, GraphQLType> entry : mutations.entrySet()) {
+			addMutation(entry.getKey(), entry.getValue());
+		}
+		
+		Map<String, GraphQLType> queries = schema.getQuerys();
+		for (Map.Entry<String, GraphQLType> entry : queries.entrySet()) {
+			addQuery(entry.getKey(), entry.getValue());
+		}
+		
+		Map<String, GraphQLType> subscriptions = schema.getSubscriptions();
+		for (Map.Entry<String, GraphQLType> entry : subscriptions.entrySet()) {
+			addSubscription(entry.getKey(), entry.getValue());
+		}
+		
+		Map<String, GraphQLType> types = schema.getTypes();
+		for (Map.Entry<String, GraphQLType> entry : types.entrySet()) {
+			addType(entry.getKey(), entry.getValue());
+		}
+		
+		Map<String, List<String>> unions = schema.getUnions();
+		for (Map.Entry<String, List<String>> entry : unions.entrySet()) {
+			addUnion(entry.getKey(), entry.getValue());
+		}
+	}
 
 	public String getSchemaQueryType() {
 		return schemaQueryType;

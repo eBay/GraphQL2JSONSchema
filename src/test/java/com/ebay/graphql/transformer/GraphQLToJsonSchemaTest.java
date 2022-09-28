@@ -541,20 +541,20 @@ public class GraphQLToJsonSchemaTest {
 		GraphQLReference enumRef = new GraphQLReference("EnrollmentStatusEnum");
 		enumRef.makeNonNullable();
 		
-		GraphQLObject vaultEnrollmentStatusOutput = new GraphQLObject();
-		vaultEnrollmentStatusOutput.addField("enrollmentStatus", enumRef);
-		vaultEnrollmentStatusOutput.addField("didUserPassRISK", new GraphQLScalar(GraphQLScalarValue.BOOLEAN));
-		vaultEnrollmentStatusOutput.addField("enrollmentTime", new GraphQLScalar(GraphQLScalarValue.STRING));
-		vaultEnrollmentStatusOutput.addField("enrollmentLocales", new GraphQLList(new GraphQLScalar(GraphQLScalarValue.STRING), Dimensionality.SINGLE));
+		GraphQLObject enrollmentStatusOutput = new GraphQLObject();
+		enrollmentStatusOutput.addField("enrollmentStatus", enumRef);
+		enrollmentStatusOutput.addField("didPassRISK", new GraphQLScalar(GraphQLScalarValue.BOOLEAN));
+		enrollmentStatusOutput.addField("enrollmentTime", new GraphQLScalar(GraphQLScalarValue.STRING));
+		enrollmentStatusOutput.addField("enrollmentLocales", new GraphQLList(new GraphQLScalar(GraphQLScalarValue.STRING), Dimensionality.SINGLE));
 		
 		GraphQLSchema schema = new GraphQLSchema();
-		schema.addType("VaultEnrollmentStatusOutput", vaultEnrollmentStatusOutput);
+		schema.addType("EnrollmentStatusOutput", enrollmentStatusOutput);
 		schema.addType("EnrollmentStatusEnum", enrollmentStatusEnum);
-		schema.addQuery("isVaultUserEnrolled(vaultUserEnrolledInput: VaultUserEnrolledInput)", new GraphQLReference("VaultEnrollmentStatusOutput"));
+		schema.addQuery("isEnrolled(enrolledInput: EnrolledInput)", new GraphQLReference("EnrollmentStatusOutput"));
 		
 		graphQLToJsonSchema = new GraphQLToJsonSchema(schema);
 		
-		JsonNode actualNode = graphQLToJsonSchema.convertQuery("isVaultUserEnrolled(vaultUserEnrolledInput: VaultUserEnrolledInput)");
+		JsonNode actualNode = graphQLToJsonSchema.convertQuery("isEnrolled(enrolledInput: EnrolledInput)");
 		JsonNode expectedNode = loadResourceFile("/com/ebay/graphql/transformer/convertQuery.json");
 		
 		assertThat(actualNode, is(equalTo(expectedNode)));
@@ -575,20 +575,20 @@ public class GraphQLToJsonSchemaTest {
 		GraphQLReference enumRef = new GraphQLReference("EnrollmentStatusEnum");
 		enumRef.makeNonNullable();
 		
-		GraphQLObject vaultEnrollmentStatusOutput = new GraphQLObject();
-		vaultEnrollmentStatusOutput.addField("enrollmentStatus", enumRef);
-		vaultEnrollmentStatusOutput.addField("didUserPassRISK", new GraphQLScalar(GraphQLScalarValue.BOOLEAN));
-		vaultEnrollmentStatusOutput.addField("enrollmentTime", new GraphQLScalar(GraphQLScalarValue.STRING));
-		vaultEnrollmentStatusOutput.addField("enrollmentLocales", new GraphQLList(new GraphQLScalar(GraphQLScalarValue.STRING), Dimensionality.SINGLE));
+		GraphQLObject enrollmentStatusOutput = new GraphQLObject();
+		enrollmentStatusOutput.addField("enrollmentStatus", enumRef);
+		enrollmentStatusOutput.addField("didPassRISK", new GraphQLScalar(GraphQLScalarValue.BOOLEAN));
+		enrollmentStatusOutput.addField("enrollmentTime", new GraphQLScalar(GraphQLScalarValue.STRING));
+		enrollmentStatusOutput.addField("enrollmentLocales", new GraphQLList(new GraphQLScalar(GraphQLScalarValue.STRING), Dimensionality.SINGLE));
 		
 		GraphQLSchema schema = new GraphQLSchema();
-		schema.addType("VaultEnrollmentStatusOutput", vaultEnrollmentStatusOutput);
+		schema.addType("EnrollmentStatusOutput", enrollmentStatusOutput);
 		schema.addType("EnrollmentStatusEnum", enrollmentStatusEnum);
-		schema.addMutation("unEnrollVaultUser", new GraphQLReference("VaultEnrollmentStatusOutput"));
+		schema.addMutation("unEnroll", new GraphQLReference("EnrollmentStatusOutput"));
 		
 		graphQLToJsonSchema = new GraphQLToJsonSchema(schema);
 		
-		JsonNode actualNode = graphQLToJsonSchema.convertMutation("unEnrollVaultUser");
+		JsonNode actualNode = graphQLToJsonSchema.convertMutation("unEnroll");
 		JsonNode expectedNode = loadResourceFile("/com/ebay/graphql/transformer/convertQuery.json");
 		
 		assertThat(actualNode, is(equalTo(expectedNode)));

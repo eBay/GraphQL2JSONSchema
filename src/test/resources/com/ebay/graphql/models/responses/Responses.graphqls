@@ -1,0 +1,37 @@
+# Output for isEnrolled
+"Output type for isEnrolled"
+type EnrollmentStatusOutput {
+    "current enrollment status"
+    enrollmentStatus: EnrollmentStatusEnum!
+    "has successfully passed risk checks"
+    didPassRISK: Boolean
+    "time of enrollment"
+    enrollmentTime: String
+    "sites where enrolled"
+    enrollmentLocales: [String]
+}
+
+"Output type for pre-enrollment"
+type PreEnrollmentOutput implements Token {
+    "current enrollment status"
+    enrollmentStatus: EnrollmentStatusEnum!
+    "is preEnrolled"
+    preEnrolled: Boolean
+}
+
+"Output type enrollment"
+type EnrollmentOutput implements Token{
+    "current enrollment status"
+    enrollmentStatus: EnrollmentStatusEnum!
+    "is preEnrolled"
+    preEnrolled: Boolean
+}
+
+# Enrollment statuses
+"""Possibles statuses of a Enrollment"""
+enum EnrollmentStatusEnum {
+    """Status is enrolled"""
+    ENROLLED
+    """Status is not enrolled"""
+    NOT_ENROLLED
+}

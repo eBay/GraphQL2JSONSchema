@@ -1,0 +1,5 @@
+"Interface for token"
+interface Token {
+    enrollmentStatus: EnrollmentStatusEnum!
+    preEnrolled: Boolean
+}

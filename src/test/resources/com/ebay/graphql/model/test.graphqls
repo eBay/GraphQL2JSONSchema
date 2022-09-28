@@ -1,0 +1,78 @@
+extend type Query {
+    # [internal] Check if enrolled.
+    "Check if enrolled"
+    isEnrolled(enrolledInput: EnrolledInput): EnrollmentStatusOutput
+}
+
+extend type Mutation {
+    # external
+    "Pre-enroll"
+    preEnroll: PreEnrollmentOutput
+    # external
+    "Complete enrollment"
+    completeEnrollment(completeInput: CompleteInput): EnrollmentOutput
+    # internal
+    "Un-enrolling enrollment"
+    unEnroll: EnrollmentStatusOutput
+}
+
+# Input for CompleteEnrollment Mutation
+"Input for CompleteEnrollment Mutation"
+input CompleteInput {
+    "referenceId for Identity"
+    refId: ID!
+}
+
+# Input for IsEnrolled
+"Input for IsEnrolled Mutation"
+input EnrolledInput {
+    "legacyUserId of user"
+    userId: ID
+    "siteId"
+    siteId: Int
+    "check status at account level if set to true"
+    accountLevelEnrollment: Boolean!
+}
+"Interface for token"
+interface Token {
+    enrollmentStatus: EnrollmentStatusEnum!
+    preEnrolled: Boolean
+}
+
+# Output for isEnrolled
+"Output type for isEnrolled"
+type EnrollmentStatusOutput {
+    "current enrollment status"
+    enrollmentStatus: EnrollmentStatusEnum!
+    "has successfully passed risk checks"
+    didPassRISK: Boolean
+    "time of enrollment"
+    enrollmentTime: String
+    "sites where enrolled"
+    enrollmentLocales: [String]
+}
+
+"Output type for pre-enrollment"
+type PreEnrollmentOutput implements Token {
+    "current enrollment status"
+    enrollmentStatus: EnrollmentStatusEnum!
+    "is preEnrolled "
+    preEnrolled: Boolean
+}
+
+"Output type enrollment"
+type EnrollmentOutput implements Token{
+    "current enrollment status"
+    enrollmentStatus: EnrollmentStatusEnum!
+    "is preEnrolled"
+    preEnrolled: Boolean
+}
+
+# Enrollment statuses
+"""Possibles statuses of a Enrollment"""
+enum EnrollmentStatusEnum {
+    """Status is enrolled"""
+    ENROLLED
+    """Status is not enrolled"""
+    NOT_ENROLLED
+}

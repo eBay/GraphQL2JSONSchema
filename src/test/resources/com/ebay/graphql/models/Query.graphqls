@@ -1,0 +1,5 @@
+extend type Query {
+    # [internal] Check if enrolled.
+    "Check if enrolled"
+    isEnrolled(enrolledInput: EnrolledInput): EnrollmentStatusOutput
+}

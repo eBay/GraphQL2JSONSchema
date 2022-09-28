@@ -369,7 +369,6 @@ public class GraphQLMatcherTest {
 			{ "	", LineType.UNMATCHED_TEXT },
 			{ "		", LineType.UNMATCHED_TEXT },
 			{ "Some random text", LineType.UNMATCHED_TEXT },
-			{ null, LineType.UNMATCHED_TEXT },
 		};
 	}
 	
@@ -377,6 +376,12 @@ public class GraphQLMatcherTest {
 	public void lineTypeMatchingTest(String line, LineType expectedLineType) {
 		LineType actualLineType = GraphQLMatcher.getLineType(line);
 		assertThat(String.format("[%s] does not yield expected LineType.", line), actualLineType, is(equalTo(expectedLineType)));
+	}
+	
+	@Test
+	public void lineTypeMatchingForNullLine() {
+		LineType actualLineType = GraphQLMatcher.getLineType(null);
+		assertThat(actualLineType, is(equalTo(LineType.UNMATCHED_TEXT)));
 	}
 	
 	@DataProvider(name = "deprecatedLineValues")
