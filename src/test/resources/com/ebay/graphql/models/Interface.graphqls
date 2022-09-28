@@ -1,5 +1,5 @@
-"Interface for Vault token"
-interface VaultToken {
+"Interface for token"
+interface Token {
     enrollmentStatus: EnrollmentStatusEnum!
     preEnrolled: Boolean
 }

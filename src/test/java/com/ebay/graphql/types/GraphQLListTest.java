@@ -59,7 +59,6 @@ public class GraphQLListTest {
 	@DataProvider(name = "invalidListValues")
 	public Object[][] invalidListValues() {
 		return new Object[][] {
-			{ null },
 			{ "" },
 			{ "[]" },
 			{ "[[]]" },
@@ -74,5 +73,10 @@ public class GraphQLListTest {
 	@Test(dataProvider = "invalidListValues", expectedExceptions = ParseException.class)
 	public void parseInvalidLists(String line) throws ParseException {
 		new GraphQLList(line);
+	}
+	
+	@Test(expectedExceptions = ParseException.class)
+	public void parseInvalidNullList() throws ParseException {
+		new GraphQLList(null);
 	}
 }

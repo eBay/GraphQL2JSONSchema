@@ -1,17 +1,17 @@
-# Input for CompleteVaultUserEnrollment Mutation
-"Input for CompleteVaultUserEnrollment Mutation"
-input CompleteVaultUserInput {
+# Input for CompleteEnrollment Mutation
+"Input for CompleteEnrollment Mutation"
+input CompleteInput {
     "referenceId for Identity"
     refId: ID!
 }
 
-# Input for IsVaultUserEnrolled
-"Input for IsVaultUserEnrolled Mutation"
-input VaultUserEnrolledInput {
+# Input for IsEnrolled
+"Input for IsEnrolled Mutation"
+input EnrolledInput {
     "legacyUserId of user"
     userId: ID
     "siteId"
     siteId: Int
-    "check user's vault status at account level if set to true"
+    "check status at account level if set to true"
     accountLevelEnrollment: Boolean!
 }

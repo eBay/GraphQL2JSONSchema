@@ -4,7 +4,7 @@
 		"enrollmentStatus": {
 			"enum": ["ENROLLED", "NOT_ENROLLED"]
 		},
-		"didUserPassRISK": {
+		"didPassRISK": {
 			"type": ["boolean", "null"]
 		},
 		"enrollmentTime": {
