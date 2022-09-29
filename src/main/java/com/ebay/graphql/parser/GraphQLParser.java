@@ -255,7 +255,7 @@ public class GraphQLParser {
 
 	protected final String getObjectTypeName(String currentLine) {
 		
-		currentLine = currentLine.replace("type", "");
+		currentLine = currentLine.replaceFirst("^\\s*type\\s", "");
 		currentLine = currentLine.replace("{", "");
 
 		// Drop the interface if it exists
