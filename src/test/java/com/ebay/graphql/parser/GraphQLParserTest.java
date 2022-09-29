@@ -149,6 +149,24 @@ public class GraphQLParserTest {
 		assertThat(actualSchema, is(equalTo(expectedSchema)));
 	}
 	
+	@DataProvider(name = "getObjectTypeNameValues")
+	public Object[][] getObjectTypeNameValues() {
+		return new Object[][] {
+			{ "type Foo {", "Foo" },
+			{ "type Foo ", "Foo" },
+			{ "type FooType {", "FooType" },
+			{ "type Footype {", "Footype" },
+			{ "Footype {", "Footype" },
+			{ "Footype", "Footype" },
+		};
+	}
+
+	@Test(dataProvider = "getObjectTypeNameValues")
+	public void getObjectTypeName(String line, String expected) {
+		String actual = parser.getObjectTypeName(line);
+		assertThat(actual, is(equalTo(expected)));
+	}
+	
 	@DataProvider(name = "scalarTestValues")
 	public Object[][] getScalarTestValues() {
 		return new Object[][] {
