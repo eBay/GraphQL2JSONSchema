@@ -85,6 +85,13 @@ public class GraphQLFileTest {
 	}
 	
 	@Test
+	public void getCurentLineAndAdvance() {
+		assertThat(file.getCurrentLine(), is(equalTo("one")));
+		assertThat(file.getCurrentLineAndThenAdvance(), is(equalTo("one")));
+		assertThat(file.getCurrentLine(), is(equalTo("two")));
+	}
+	
+	@Test
 	public void readPastLastLine() {
 		file.getNextLine();
 		file.getNextLine();

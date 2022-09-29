@@ -25,6 +25,10 @@ public class GraphQLSchema {
 	// Tracks union definitions in the schema.
 	private Map<String, List<String>> unions = new HashMap<>();
 	
+	private String queryTypeName;
+	private String mutationTypeName;
+	private String subscriptionTypeName;
+	
 	public void addSchema(GraphQLSchema schema) {
 		
 		Map<String, GraphQLType> mutations = schema.getMutations();
@@ -51,6 +55,30 @@ public class GraphQLSchema {
 		for (Map.Entry<String, List<String>> entry : unions.entrySet()) {
 			addUnion(entry.getKey(), entry.getValue());
 		}
+	}
+	
+	public String getQueryTypeName() {
+		return queryTypeName;
+	}
+
+	public void setQueryTypeName(String queryTypeName) {
+		this.queryTypeName = queryTypeName;
+	}
+
+	public String getMutationTypeName() {
+		return mutationTypeName;
+	}
+
+	public void setMutationTypeName(String mutationTypeName) {
+		this.mutationTypeName = mutationTypeName;
+	}
+
+	public String getSubscriptionTypeName() {
+		return subscriptionTypeName;
+	}
+
+	public void setSubscriptionTypeName(String subscriptionTypeName) {
+		this.subscriptionTypeName = subscriptionTypeName;
 	}
 
 	public String getSchemaQueryType() {

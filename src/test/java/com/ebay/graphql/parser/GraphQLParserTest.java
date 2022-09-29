@@ -315,6 +315,18 @@ public class GraphQLParserTest {
 		assertThat(actualSchema, is(equalTo(expectedSchema)));
 	}
 	
+	@Test
+	public void parseSchemaQuery() throws ParseException {
+
+		List<String> lines = Arrays.asList("schema {", "\tquery: Foo", "}", "", "type Foo {", "\ttestApi(query: String, types: [String]): String", "}");
+		GraphQLSchema expectedSchema = new GraphQLSchema();
+		expectedSchema.addQuery("testApi(query: String, types: [String])", new GraphQLScalar(GraphQLScalarValue.STRING));
+
+		GraphQLFile graphQLFile = getGraphQLFile(lines);
+		GraphQLSchema actualSchema = parser.processLinesOfText(graphQLFile);
+		assertThat(actualSchema, is(equalTo(expectedSchema)));
+	}
+	
 	@DataProvider(name = "parseMutationValues")
 	public Object[][] parseMutationValues() {
 		
@@ -353,6 +365,18 @@ public class GraphQLParserTest {
 		assertThat(actualSchema, is(equalTo(expectedSchema)));
 	}
 	
+	@Test
+	public void parseSchemaMutation() throws ParseException {
+
+		List<String> lines = Arrays.asList("schema {", "\tmutation: Foo", "}", "", "type Foo {", "\ttestApi(query: String, types: [String]): String", "}");
+		GraphQLSchema expectedSchema = new GraphQLSchema();
+		expectedSchema.addMutation("testApi(query: String, types: [String])", new GraphQLScalar(GraphQLScalarValue.STRING));
+
+		GraphQLFile graphQLFile = getGraphQLFile(lines);
+		GraphQLSchema actualSchema = parser.processLinesOfText(graphQLFile);
+		assertThat(actualSchema, is(equalTo(expectedSchema)));
+	}
+	
 	@DataProvider(name = "parseSubscriptionValues")
 	public Object[][] parseSubscriptionValues() {
 		
@@ -388,6 +412,18 @@ public class GraphQLParserTest {
 		GraphQLFile graphQLFile = getGraphQLFile(queryDefinition);
 		GraphQLSchema actualSchema = new GraphQLSchema();
 		parser.processSubscription(graphQLFile, actualSchema);
+		assertThat(actualSchema, is(equalTo(expectedSchema)));
+	}
+	
+	@Test
+	public void parseSchemaSubscription() {
+
+		List<String> lines = Arrays.asList("schema {", "\tsubscription: Foo", "}", "", "type Foo {", "\ttestApi(query: String, types: [String]): String", "}");
+		GraphQLSchema expectedSchema = new GraphQLSchema();
+		expectedSchema.addSubscription("testApi(query: String, types: [String])", new GraphQLScalar(GraphQLScalarValue.STRING));
+
+		GraphQLFile graphQLFile = getGraphQLFile(lines);
+		GraphQLSchema actualSchema = parser.processLinesOfText(graphQLFile);
 		assertThat(actualSchema, is(equalTo(expectedSchema)));
 	}
 	
@@ -479,6 +515,20 @@ public class GraphQLParserTest {
 	
 		// Compare
 		assertThat(actualSchema, is(equalTo(expectedSchema)));
+	}
+	
+	@Test
+	public void cdcSchema() throws IOException, URISyntaxException {
+
+		File file = getGraphQLResourceFile("com/ebay/graphql/cdc/cdcschema.graphql");
+		GraphQLSchema actualSchema = parser.parseGraphQL(file);
+
+		// Schema query and mutation MUST be populated
+		Map<String, GraphQLType> querys = actualSchema.getQuerys();
+		Map<String, GraphQLType> mutations = actualSchema.getMutations();
+
+		assertThat("Query results MUST NOT be empty.", querys.isEmpty(), is(equalTo(false)));
+		assertThat("Mutation results MUST NOT be empty.", mutations.isEmpty(), is(equalTo(false)));
 	}
 
 	// -------------------------------------------

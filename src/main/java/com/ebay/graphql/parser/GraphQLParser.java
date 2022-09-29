@@ -102,11 +102,13 @@ public class GraphQLParser {
 					graphQLFile.getNextLine();
 					break;
 				case SCHEMA_QUERY:
+					processSchemaQuery(graphQLFile, schema);
+					break;
 				case SCHEMA_MUTATION:
+					processSchemaMutation(graphQLFile, schema);
+					break;
 				case SCHEMA_SUBSCRIPTION:
-					// TODO: Future enhancement is to check for custom schema types for
-					// Query, Mutation and Subscription and parse those accordingly.
-					graphQLFile.getNextLine();
+					processSchemaSubscription(graphQLFile, schema);
 					break;
 				case QUERY:
 					processQuery(graphQLFile, schema);
@@ -118,7 +120,16 @@ public class GraphQLParser {
 					processSubscription(graphQLFile, schema);
 					break;
 				case OBJECT_DEFINITION:
-					processObject(graphQLFile, schema);
+					String objectTypeName = getObjectTypeName(line);
+					if (objectTypeName.equals(schema.getQueryTypeName())) {
+						processQuery(graphQLFile, schema);
+					} else if (objectTypeName.equals(schema.getMutationTypeName())) {
+						processMutation(graphQLFile, schema);
+					} else if (objectTypeName.equals(schema.getSubscriptionTypeName())) {
+						processSubscription(graphQLFile, schema);
+					} else {
+						processObject(graphQLFile, schema);
+					}
 					break;
 				case SCALAR_DEFINITION:
 					processScalar(graphQLFile, schema);
@@ -152,10 +163,9 @@ public class GraphQLParser {
 	 * @return Description.
 	 */
 	protected final String processSingleLineDescription(GraphQLFile graphQLFile) {
-		String line = graphQLFile.getCurrentLine();
+		String line = graphQLFile.getCurrentLineAndThenAdvance();
 		line = line.replaceFirst("^\"*", "");
 		line = line.replaceFirst("\"*$", "");
-		graphQLFile.getNextLine(); // If we don't do this we stay on this line indefinitely.
 		return line.trim();
 	}
 
@@ -191,6 +201,12 @@ public class GraphQLParser {
 
 		return builder.toString();
 	}
+	
+	protected final void processSchemaQuery(GraphQLFile graphQLFile, GraphQLSchema schema) {
+		String line = graphQLFile.getCurrentLineAndThenAdvance();
+		line = line.substring(line.indexOf(":") + 1).trim();
+		schema.setQueryTypeName(line);
+	}
 
 	protected final void processQuery(GraphQLFile graphQLFile, GraphQLSchema schema) throws ParseException {
 
@@ -202,6 +218,12 @@ public class GraphQLParser {
 			line = graphQLFile.peekNextLine();
 		}
 	}
+	
+	protected final void processSchemaMutation(GraphQLFile graphQLFile, GraphQLSchema schema) {
+		String line = graphQLFile.getCurrentLineAndThenAdvance();
+		line = line.substring(line.indexOf(":") + 1).trim();
+		schema.setMutationTypeName(line);
+	}
 
 	protected final void processMutation(GraphQLFile graphQLFile, GraphQLSchema schema) throws ParseException {
 
@@ -212,6 +234,12 @@ public class GraphQLParser {
 			schema.addMutation(kvp.getKey(), kvp.getValue());
 			line = graphQLFile.peekNextLine();
 		}
+	}
+	
+	protected final void processSchemaSubscription(GraphQLFile graphQLFile, GraphQLSchema schema) {
+		String line = graphQLFile.getCurrentLineAndThenAdvance();
+		line = line.substring(line.indexOf(":") + 1).trim();
+		schema.setSubscriptionTypeName(line);
 	}
 
 	protected final void processSubscription(GraphQLFile graphQLFile, GraphQLSchema schema) throws ParseException {
@@ -225,18 +253,24 @@ public class GraphQLParser {
 		}
 	}
 
-	protected final void processObject(GraphQLFile graphQLFile, GraphQLSchema schema) throws ParseException {
-		String objectName = graphQLFile.getCurrentLine();
-		objectName = objectName.replace("type", "");
-		objectName = objectName.replace("{", "");
+	protected final String getObjectTypeName(String currentLine) {
+		
+		currentLine = currentLine.replace("type", "");
+		currentLine = currentLine.replace("{", "");
 
 		// Drop the interface if it exists
-		if (objectName.contains(IMPLEMENTS_KEYWORD)) {
-			objectName = objectName.substring(0, objectName.indexOf(IMPLEMENTS_KEYWORD));
+		if (currentLine.contains(IMPLEMENTS_KEYWORD)) {
+			currentLine = currentLine.substring(0, currentLine.indexOf(IMPLEMENTS_KEYWORD));
 		}
 
-		objectName = objectName.trim();
+		currentLine = currentLine.trim();
+		return currentLine;
+	}
+		
+	protected final void processObject(GraphQLFile graphQLFile, GraphQLSchema schema) throws ParseException {
 
+		String objectName = getObjectTypeName(graphQLFile.getCurrentLine());
+		
 		GraphQLObject graphQLObject = new GraphQLObject();
 
 		FieldKeyValuePair kvp;
@@ -270,7 +304,7 @@ public class GraphQLParser {
 	}
 
 	protected final void processScalar(GraphQLFile graphQLFile, GraphQLSchema schema) throws ParseException {
-		String line = graphQLFile.getCurrentLine();
+		String line = graphQLFile.getCurrentLineAndThenAdvance();
 		line = line.replaceFirst("^^\\s*scalar", "").replaceFirst("@specifiedBy.*$", "").trim();
 		schema.addType(line, new GraphQLScalar(GraphQLScalarValue.STRING));
 	}

@@ -77,6 +77,22 @@ public class GraphQLFile {
 
 		return null;
 	}
+	
+	/**
+	 * Get the current line of text and advance line position to next line.
+	 * 
+	 * @return Current line of text or null if current line of text is not
+	 *         available.
+	 */
+	public String getCurrentLineAndThenAdvance() {
+		String line = null;
+		if (linesOfText != null && currentLineNumber < linesOfText.size()) {
+			 line = linesOfText.get(currentLineNumber);
+			 currentLineNumber++;
+		}
+
+		return line;
+	}
 
 	/**
 	 * Get the next line of text.
