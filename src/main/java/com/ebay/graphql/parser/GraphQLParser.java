@@ -191,6 +191,7 @@ public class GraphQLParser {
 					builder.append(" ");
 				}
 				builder.append(line);
+				graphQLFile.getNextLine();
 				break;
 			}
 			if (builder.length() > 0) {

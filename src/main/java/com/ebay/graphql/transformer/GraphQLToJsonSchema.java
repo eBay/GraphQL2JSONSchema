@@ -134,7 +134,15 @@ public class GraphQLToJsonSchema {
 			ObjectNode innerDimension = factory.objectNode();
 			innerDimension.set("type", getTypeDefinition(type));
 			innerDimension.set("items", factory.objectNode().setAll(listType));
-			objectNode.set("items", factory.objectNode().setAll(innerDimension));
+			
+			if (graphQLList.isInnerDimensionNullable()) {
+				objectNode.set("items", factory.objectNode().setAll(innerDimension));
+			} else {
+				ObjectNode innerNode = factory.objectNode().set("type", factory.textNode("array"));
+				innerNode.set("items", listType);
+				objectNode.set("items", innerNode);
+			}
+			
 			break;
 		case SINGLE:
 		default:

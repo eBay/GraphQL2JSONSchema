@@ -16,44 +16,55 @@ public class GraphQLListTest {
 
 	@DataProvider(name = "validListValues")
 	public Object[][] validListValues() {
+		
+		GraphQLReference nonNullableArrayElement = new GraphQLReference("Test");
+		nonNullableArrayElement.makeNonNullable();
+		
 		return new Object[][] {
-			{ "[Int]", new GraphQLScalar(GraphQLScalarValue.INT), Dimensionality.SINGLE },
-			{ " [Int]", new GraphQLScalar(GraphQLScalarValue.INT), Dimensionality.SINGLE },
-			{ "[Int] ", new GraphQLScalar(GraphQLScalarValue.INT), Dimensionality.SINGLE },
-			{ "		[Int]", new GraphQLScalar(GraphQLScalarValue.INT), Dimensionality.SINGLE },
-			{ "[[Int]]", new GraphQLScalar(GraphQLScalarValue.INT), Dimensionality.MULTI },
-			{ " [[Int]]", new GraphQLScalar(GraphQLScalarValue.INT), Dimensionality.MULTI },
-			{ "[[Int]] ", new GraphQLScalar(GraphQLScalarValue.INT), Dimensionality.MULTI },
-			{ "		[[Int]]", new GraphQLScalar(GraphQLScalarValue.INT), Dimensionality.MULTI },
-			
-			{ "[ID]", new GraphQLScalar(GraphQLScalarValue.ID), Dimensionality.SINGLE },
-			{ "[Boolean]", new GraphQLScalar(GraphQLScalarValue.BOOLEAN), Dimensionality.SINGLE },
-			{ "[Float]", new GraphQLScalar(GraphQLScalarValue.FLOAT), Dimensionality.SINGLE },
-			{ "[String]", new GraphQLScalar(GraphQLScalarValue.STRING), Dimensionality.SINGLE },
-			
-			{ "[INT]", new GraphQLScalar(GraphQLScalarValue.INT), Dimensionality.SINGLE },
-			{ "[ID]", new GraphQLScalar(GraphQLScalarValue.ID), Dimensionality.SINGLE },
-			{ "[BOOLEAN]", new GraphQLScalar(GraphQLScalarValue.BOOLEAN), Dimensionality.SINGLE },
-			{ "[FLOAT]", new GraphQLScalar(GraphQLScalarValue.FLOAT), Dimensionality.SINGLE },
-			{ "[STRING]", new GraphQLScalar(GraphQLScalarValue.STRING), Dimensionality.SINGLE },
-			{ "[int]", new GraphQLScalar(GraphQLScalarValue.INT), Dimensionality.SINGLE },
-			{ "[id]", new GraphQLScalar(GraphQLScalarValue.ID), Dimensionality.SINGLE },
-			{ "[boolean]", new GraphQLScalar(GraphQLScalarValue.BOOLEAN), Dimensionality.SINGLE },
-			{ "[float]", new GraphQLScalar(GraphQLScalarValue.FLOAT), Dimensionality.SINGLE },
-			{ "[string]", new GraphQLScalar(GraphQLScalarValue.STRING), Dimensionality.SINGLE },
-			
-			{ "[Test]", new GraphQLReference("Test"), Dimensionality.SINGLE },
-			{ "[[Test]]", new GraphQLReference("Test"), Dimensionality.MULTI },
+			{ "[Int]", new GraphQLScalar(GraphQLScalarValue.INT), Dimensionality.SINGLE, false, true },
+			{ " [Int]", new GraphQLScalar(GraphQLScalarValue.INT), Dimensionality.SINGLE, false, true },
+			{ "[Int] ", new GraphQLScalar(GraphQLScalarValue.INT), Dimensionality.SINGLE, false, true },
+			{ "		[Int]", new GraphQLScalar(GraphQLScalarValue.INT), Dimensionality.SINGLE, false, true },
+			{ "[[Int]]", new GraphQLScalar(GraphQLScalarValue.INT), Dimensionality.MULTI, true, true },
+			{ " [[Int]]", new GraphQLScalar(GraphQLScalarValue.INT), Dimensionality.MULTI, true, true },
+			{ "[[Int]] ", new GraphQLScalar(GraphQLScalarValue.INT), Dimensionality.MULTI, true, true },
+			{ "		[[Int]]", new GraphQLScalar(GraphQLScalarValue.INT), Dimensionality.MULTI, true, true },
+
+			{ "[ID]", new GraphQLScalar(GraphQLScalarValue.ID), Dimensionality.SINGLE, false, true },
+			{ "[Boolean]", new GraphQLScalar(GraphQLScalarValue.BOOLEAN), Dimensionality.SINGLE, false, true },
+			{ "[Float]", new GraphQLScalar(GraphQLScalarValue.FLOAT), Dimensionality.SINGLE, false, true },
+			{ "[String]", new GraphQLScalar(GraphQLScalarValue.STRING), Dimensionality.SINGLE, false, true },
+
+			{ "[INT]", new GraphQLScalar(GraphQLScalarValue.INT), Dimensionality.SINGLE, false, true },
+			{ "[ID]", new GraphQLScalar(GraphQLScalarValue.ID), Dimensionality.SINGLE, false, true },
+			{ "[BOOLEAN]", new GraphQLScalar(GraphQLScalarValue.BOOLEAN), Dimensionality.SINGLE, false, true },
+			{ "[FLOAT]", new GraphQLScalar(GraphQLScalarValue.FLOAT), Dimensionality.SINGLE, false, true },
+			{ "[STRING]", new GraphQLScalar(GraphQLScalarValue.STRING), Dimensionality.SINGLE, false, true },
+			{ "[int]", new GraphQLScalar(GraphQLScalarValue.INT), Dimensionality.SINGLE, false, true },
+			{ "[id]", new GraphQLScalar(GraphQLScalarValue.ID), Dimensionality.SINGLE, false, true },
+			{ "[boolean]", new GraphQLScalar(GraphQLScalarValue.BOOLEAN), Dimensionality.SINGLE, false, true },
+			{ "[float]", new GraphQLScalar(GraphQLScalarValue.FLOAT), Dimensionality.SINGLE, false, true },
+			{ "[string]", new GraphQLScalar(GraphQLScalarValue.STRING), Dimensionality.SINGLE, false, true },
+
+			{ "[Test]", new GraphQLReference("Test"), Dimensionality.SINGLE, false, true },
+			{ "[[Test]]", new GraphQLReference("Test"), Dimensionality.MULTI, true, true },
+
+			{ "[Test!]", nonNullableArrayElement, Dimensionality.SINGLE, false, true },
+			{ "[Test!]!", nonNullableArrayElement, Dimensionality.SINGLE, false, false },
+			{ "[[Test!]]", nonNullableArrayElement, Dimensionality.MULTI, true, true },
+			{ "[[Test!]!]", nonNullableArrayElement, Dimensionality.MULTI, false, true },
+			{ "[[Test!]!]!", nonNullableArrayElement, Dimensionality.MULTI, false, false },
+			{ "[[Test!]]!", nonNullableArrayElement, Dimensionality.MULTI, true, false },
 		};
 	}
 	
 	@Test(dataProvider = "validListValues")
-	public void parseValidLists(String line, GraphQLType expectedType, Dimensionality expectedDimensioniality) throws ParseException {
+	public void parseValidLists(String line, GraphQLType expectedType, Dimensionality expectedDimensioniality, boolean expectedInnerDimensionNullable, boolean expectedNullable) throws ParseException {
 		GraphQLList list = new GraphQLList(line);
-		GraphQLList expectedList = new GraphQLList(expectedType, expectedDimensioniality);
-		assertThat(list, is(equalTo(expectedList)));
-		assertThat(list.getType(), is(equalTo(expectedList.getType())));
-		assertThat(list.getDimensionality(), is(equalTo(expectedList.getDimensionality())));
+		assertThat(list.getType(), is(equalTo(expectedType)));
+		assertThat(list.getDimensionality(), is(equalTo(expectedDimensioniality)));
+		assertThat(list.isInnerDimensionNullable(), is(equalTo(expectedInnerDimensionNullable)));
+		assertThat(list.isNullable(), is(equalTo(expectedNullable)));
 	}
 	
 	@DataProvider(name = "invalidListValues")

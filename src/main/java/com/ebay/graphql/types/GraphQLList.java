@@ -12,6 +12,7 @@ public class GraphQLList implements GraphQLType {
 	private GraphQLType type;
 	private Dimensionality dimensionality;
 	private boolean nullable = true;
+	private boolean isInnerDimensionNullable = true;
 
 	public enum Dimensionality {
 		SINGLE, MULTI
@@ -50,7 +51,7 @@ public class GraphQLList implements GraphQLType {
 	@Generated
 	@Override
 	public int hashCode() {
-		return Objects.hash(dimensionality, nullable, type);
+		return Objects.hash(dimensionality, nullable, isInnerDimensionNullable, type);
 	}
 
 	@Generated
@@ -63,13 +64,15 @@ public class GraphQLList implements GraphQLType {
 		if (getClass() != obj.getClass())
 			return false;
 		GraphQLList other = (GraphQLList) obj;
-		return dimensionality == other.dimensionality && nullable == other.nullable && Objects.equals(type, other.type);
+		return dimensionality == other.dimensionality && nullable == other.nullable
+				&& isInnerDimensionNullable == other.isInnerDimensionNullable && Objects.equals(type, other.type);
 	}
 
 	@Generated
 	@Override
 	public String toString() {
-		return "GraphQLList [type=" + type + ", dimensionality=" + dimensionality + ", nullable=" + nullable + "]";
+		return "GraphQLList [type=" + type + ", dimensionality=" + dimensionality + ", nullable=" + nullable
+				+ ", isInnerDimensionNullable=" + isInnerDimensionNullable + "]";
 	}
 
 	/**
@@ -86,18 +89,33 @@ public class GraphQLList implements GraphQLType {
 
 		listSignature = listSignature.trim();
 
-		if (Pattern.matches("^([\\[]{2})\\s*([A-Za-z_])([A-Za-z0-9_]*)\\s*([\\]]{2})$", listSignature)) {
+		if (Pattern.matches("^([\\[]{2})\\s*([A-Za-z_])([A-Za-z0-9_]*)([\\!])?\\s*(\\]\\]|\\]\\!\\])([\\!])?$",
+				listSignature)) {
 			dimensionality = Dimensionality.MULTI;
-		} else if (Pattern.matches("^([\\[]{1})\\s*([A-Za-z_])([A-Za-z0-9_]*)\\s*([\\]]{1})$", listSignature)) {
+			if (Pattern.matches("^.*(\\]\\!\\])([\\!])?$", listSignature)) {
+				isInnerDimensionNullable = false;
+			}
+		} else if (Pattern.matches("^([\\[]{1})\\s*([A-Za-z_])([A-Za-z0-9_])*([\\!])?\\s*([\\]]{1})([\\!])?$",
+				listSignature)) {
 			dimensionality = Dimensionality.SINGLE;
 		} else {
 			throw new ParseException(
-					String.format("Parsing of list value is not possible with list definition: [%s].", listSignature),
+					String.format("Parsing of list value is not possible with list definition: %s.", listSignature),
 					-1);
 		}
 
+		if (listSignature.endsWith("!")) {
+			nullable = false;
+		}
+		
 		listSignature = listSignature.replaceFirst("^\\[*", "");
-		listSignature = listSignature.replaceFirst("\\]*$", "");
+		listSignature = listSignature.substring(0, listSignature.indexOf("]"));
+
+		boolean isNullable = true;
+		if (listSignature.endsWith("!")) {
+			listSignature = listSignature.substring(0, listSignature.length() - 1);
+			isNullable = false;
+		}
 
 		if ("Boolean".equalsIgnoreCase(listSignature)) {
 			type = new GraphQLScalar(GraphQLScalarValue.BOOLEAN);
@@ -112,6 +130,10 @@ public class GraphQLList implements GraphQLType {
 		} else {
 			type = new GraphQLReference(listSignature);
 		}
+		
+		if (!isNullable) {
+			type.makeNonNullable();
+		}
 	}
 
 	@Generated
@@ -124,5 +146,28 @@ public class GraphQLList implements GraphQLType {
 	@Override
 	public boolean isNullable() {
 		return nullable;
+	}
+	
+	/**
+	 * For two-dimensional arrays it is possible to have the inner dimension be non
+	 * nullable. Check if the inner dimension is nullable or not.
+	 * 
+	 * EG: [[Test]!] - The inner array is non-nullable.
+	 * 
+	 * @return True if array is two-dimensional and inner array is nullable, false
+	 *         otherwise.
+	 */
+	public boolean isInnerDimensionNullable() {
+		if (dimensionality == Dimensionality.MULTI) {
+			return isInnerDimensionNullable;
+		}
+		return false;
+	}
+
+	/**
+	 * Make the inner list, of a multi-dimensional list, non nullable.
+	 */
+	public void makeInnerDimensionNonNullable() {
+		isInnerDimensionNullable = false;
 	}
 }
