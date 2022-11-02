@@ -9,8 +9,6 @@ import java.text.ParseException;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.ebay.graphql.parser.GraphQLParserUtil;
-
 public class GraphQLParserUtilTest {
 	
 	@DataProvider(name = "keyValues")

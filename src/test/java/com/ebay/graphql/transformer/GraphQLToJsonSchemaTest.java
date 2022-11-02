@@ -28,7 +28,10 @@ import com.ebay.graphql.types.GraphQLScalar;
 import com.ebay.graphql.types.GraphQLType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 public class GraphQLToJsonSchemaTest {
 	
@@ -433,6 +436,204 @@ public class GraphQLToJsonSchemaTest {
 		JsonNode actualNode = graphQLToJsonSchema.convertList(list);
 		JsonNode expectedNode = loadResourceFile("/com/ebay/graphql/transformer/nonNullableMultidimensionalList.json");
 		
+		assertThat(actualNode, is(equalTo(expectedNode)));
+	}
+	
+	@Test
+	public void convertList() {
+		GraphQLList list = new GraphQLList(new GraphQLScalar(GraphQLScalarValue.INT), Dimensionality.SINGLE);
+		JsonNode actualNode =  graphQLToJsonSchema.convertList(list);
+
+		// Construct expected
+		ArrayNode typeArrayNode = factory.arrayNode().add("integer").add("null");
+		ObjectNode typeNode = factory.objectNode();
+		typeNode.set("type", typeArrayNode);
+
+		ArrayNode rootArrayNode = factory.arrayNode().add("array").add("null");
+
+		ObjectNode expectedNode = factory.objectNode();
+		expectedNode.set("type", rootArrayNode);
+		expectedNode.set("items", typeNode);
+
+		assertThat(actualNode, is(equalTo(expectedNode)));
+	}
+
+	@Test
+	public void convertListWithNonNullableType() {
+
+		GraphQLScalar type = new GraphQLScalar(GraphQLScalarValue.INT);
+		type.makeNonNullable();
+		GraphQLList list = new GraphQLList(type, Dimensionality.SINGLE);
+		JsonNode actualNode =  graphQLToJsonSchema.convertList(list);
+
+		// Construct expected
+		TextNode textNode = factory.textNode("integer");
+		ObjectNode typeNode = factory.objectNode();
+		typeNode.set("type", textNode);
+
+		ArrayNode rootArrayNode = factory.arrayNode().add("array").add("null");
+
+		ObjectNode expectedNode = factory.objectNode();
+		expectedNode.set("type", rootArrayNode);
+		expectedNode.set("items", typeNode);
+
+		assertThat(actualNode, is(equalTo(expectedNode)));
+	}
+
+	@Test
+	public void convertListWithNonNullableArray() {
+
+		GraphQLScalar type = new GraphQLScalar(GraphQLScalarValue.INT);
+		GraphQLList list = new GraphQLList(type, Dimensionality.SINGLE);
+		list.makeNonNullable();
+		JsonNode actualNode =  graphQLToJsonSchema.convertList(list);
+
+		// Construct expected
+		ArrayNode arrayNode = factory.arrayNode().add("integer").add("null");
+		ObjectNode typeNode = factory.objectNode();
+		typeNode.set("type", arrayNode);
+
+		TextNode rootArrayNode = factory.textNode("array");
+
+		ObjectNode expectedNode = factory.objectNode();
+		expectedNode.set("type", rootArrayNode);
+		expectedNode.set("items", typeNode);
+
+		assertThat(actualNode, is(equalTo(expectedNode)));
+	}
+
+	@Test
+	public void convertMultiDimensionalListTypeDefinition() {
+		GraphQLList list = new GraphQLList(new GraphQLScalar(GraphQLScalarValue.INT), Dimensionality.MULTI);
+		JsonNode actualNode =  graphQLToJsonSchema.convertList(list);
+
+		// Construct expected
+		ArrayNode type = factory.arrayNode().add("integer").add("null");
+		ObjectNode typeNode = factory.objectNode();
+		typeNode.set("type", type);
+
+		ArrayNode innerDimensionNodeType = factory.arrayNode().add("array").add("null");
+
+		ObjectNode innerDimension = factory.objectNode();
+		innerDimension.set("type", innerDimensionNodeType);
+		innerDimension.set("items", typeNode);
+
+		ArrayNode rootArrayNode = factory.arrayNode().add("array").add("null");
+
+		ObjectNode expectedNode = factory.objectNode();
+		expectedNode.set("type", rootArrayNode);
+		expectedNode.set("items", innerDimension);
+
+		assertThat(actualNode, is(equalTo(expectedNode)));
+	}
+
+	@Test
+	public void convertMultiDimensionalListTypeDefinitionNonNullable() {
+		GraphQLScalar scalar = new GraphQLScalar(GraphQLScalarValue.INT);
+		scalar.makeNonNullable();
+		GraphQLList list = new GraphQLList(scalar, Dimensionality.MULTI);
+		JsonNode actualNode =  graphQLToJsonSchema.convertList(list);
+
+		// Construct expected
+		TextNode type = factory.textNode("integer");
+		ObjectNode typeNode = factory.objectNode();
+		typeNode.set("type", type);
+
+		ArrayNode innerDimensionNodeType = factory.arrayNode().add("array").add("null");
+
+		ObjectNode innerDimension = factory.objectNode();
+		innerDimension.set("type", innerDimensionNodeType);
+		innerDimension.set("items", typeNode);
+
+		ArrayNode rootArrayNode = factory.arrayNode().add("array").add("null");
+
+		ObjectNode expectedNode = factory.objectNode();
+		expectedNode.set("type", rootArrayNode);
+		expectedNode.set("items", innerDimension);
+
+		assertThat(actualNode, is(equalTo(expectedNode)));
+	}
+
+	@Test
+	public void convertMultiDimensionalListWithInnerArrayNonNullable() {
+		GraphQLScalar scalar = new GraphQLScalar(GraphQLScalarValue.INT);
+		GraphQLList list = new GraphQLList(scalar, Dimensionality.MULTI);
+		list.makeInnerDimensionNonNullable();
+		JsonNode actualNode =  graphQLToJsonSchema.convertList(list);
+
+		// Construct expected
+		ArrayNode type = factory.arrayNode().add("integer").add("null");
+		ObjectNode typeNode = factory.objectNode();
+		typeNode.set("type", type);
+
+		TextNode innerDimensionNodeType = factory.textNode("array");
+
+		ObjectNode innerDimension = factory.objectNode();
+		innerDimension.set("type", innerDimensionNodeType);
+		innerDimension.set("items", typeNode);
+
+		ArrayNode rootArrayNode = factory.arrayNode().add("array").add("null");
+
+		ObjectNode expectedNode = factory.objectNode();
+		expectedNode.set("type", rootArrayNode);
+		expectedNode.set("items", innerDimension);
+
+		assertThat(actualNode, is(equalTo(expectedNode)));
+	}
+
+	@Test
+	public void convertMultiDimensionalListWithOutterArrayNonNullable() {
+		GraphQLScalar scalar = new GraphQLScalar(GraphQLScalarValue.INT);
+		GraphQLList list = new GraphQLList(scalar, Dimensionality.MULTI);
+		list.makeNonNullable();
+		JsonNode actualNode =  graphQLToJsonSchema.convertList(list);
+
+		// Construct expected
+		ArrayNode type = factory.arrayNode().add("integer").add("null");
+		ObjectNode typeNode = factory.objectNode();
+		typeNode.set("type", type);
+
+		TextNode innerDimensionNodeType = factory.textNode("array");
+
+		ObjectNode innerDimension = factory.objectNode();
+		innerDimension.set("type", innerDimensionNodeType);
+		innerDimension.set("items", typeNode);
+
+		TextNode rootArrayNode = factory.textNode("array");
+
+		ObjectNode expectedNode = factory.objectNode();
+		expectedNode.set("type", rootArrayNode);
+		expectedNode.set("items", innerDimension);
+
+		assertThat(actualNode, is(equalTo(expectedNode)));
+	}
+
+	@Test
+	public void convertMultiDimensionalListWithEverythingNonNullable() {
+		GraphQLScalar scalar = new GraphQLScalar(GraphQLScalarValue.INT);
+		scalar.makeNonNullable();
+		GraphQLList list = new GraphQLList(scalar, Dimensionality.MULTI);
+		list.makeNonNullable();
+		list.makeInnerDimensionNonNullable();
+		JsonNode actualNode =  graphQLToJsonSchema.convertList(list);
+
+		// Construct expected
+		TextNode type = factory.textNode("integer");
+		ObjectNode typeNode = factory.objectNode();
+		typeNode.set("type", type);
+
+		TextNode innerDimensionNodeType = factory.textNode("array");
+
+		ObjectNode innerDimension = factory.objectNode();
+		innerDimension.set("type", innerDimensionNodeType);
+		innerDimension.set("items", typeNode);
+
+		TextNode rootArrayNode = factory.textNode("array");
+
+		ObjectNode expectedNode = factory.objectNode();
+		expectedNode.set("type", rootArrayNode);
+		expectedNode.set("items", innerDimension);
+
 		assertThat(actualNode, is(equalTo(expectedNode)));
 	}
 	
