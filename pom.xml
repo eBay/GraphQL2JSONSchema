@@ -2,9 +2,10 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.ebay.nst</groupId>
 	<artifactId>graphql-to-jsonschema</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.2</version>
 	<name>GraphQL 2 JSON Schema</name>
 	<description>Converts GraphQL schema to JSON schema.</description>
+	<url>https://github.com/eBay/GraphQL2JSONSchema</url>
 
 	<licenses>
 		<license>
@@ -12,6 +13,15 @@
 			<url>https://www.apache.org/licenses/LICENSE-2.0</url>
 		</license>
 	</licenses>
+
+	<developers>
+		<developer>
+			<name>Ben Yarger</name>
+			<email>byarger@ebay.com</email>
+			<organization>eBay</organization>
+			<organizationUrl>https://github.com/ebay</organizationUrl>
+		</developer>
+	</developers>
 
 	<packaging>jar</packaging>
 
@@ -21,21 +31,17 @@
 	</properties>
 
 	<scm>
-		<connection>scm:git:git://git@github.scm.corp.ebay.com:eBayMobile/GraphQL2JSONSchema.git</connection>
-		<developerConnection>scm:git:git@github.scm.corp.ebay.com:eBayMobile/GraphQL2JSONSchema.git</developerConnection>
-		<url>scm:git:git://git@github.scm.corp.ebay.com:eBayMobile/GraphQL2JSONSchema.git</url>
-		<tag>HEAD</tag>
+		<connection>scm:git:git://github.com/eBay/GraphQL2JSONSchema.git</connection>
+		<developerConnection>scm:git:ssh://github.com:eBay/GraphQL2JSONSchema.git</developerConnection>
+		<url>https://github.com/eBay/GraphQL2JSONSchema/tree/main</url>
 	</scm>
 
 	<distributionManagement>
 		<repository>
-			<id>raptor.releases</id>
-			<url>http://ebaycentral.qa.ebay.com/content/repositories/releases/</url>
+			<id>ossrh</id>
+			<name>Central Repository OSSRH</name>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 		</repository>
-		<snapshotRepository>
-			<id>raptor.snapshots</id>
-			<url>http://ebaycentral.qa.ebay.com/content/repositories/snapshots/</url>
-		</snapshotRepository>
 	</distributionManagement>
 
 	<dependencies>
@@ -135,6 +141,67 @@
 					<useManifestOnlyJar>false</useManifestOnlyJar>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>3.0.1</version>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+						<configuration>
+							<gpgArguments>
+								<arg>--pinentry-mode</arg>
+								<arg>loopback</arg>
+							</gpgArguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.2.0</version>
+				<executions>
+					<execution>
+						<id>attach-javadoc</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-source</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>1.6.7</version>
+				<extensions>true</extensions>
+				<configuration>
+					<serverId>ossrh</serverId>
+					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+					<autoReleaseAfterClose>true</autoReleaseAfterClose>
+				</configuration>
+			</plugin>
+
 		</plugins>
 	</build>
 </project>

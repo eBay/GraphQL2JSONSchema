@@ -20,7 +20,7 @@ public class FieldKeyValuePair {
 	}
 
 	/**
-	 * Initialize from a string with the format <key>:<value>
+	 * Initialize from a string with the format {@code <key>:<value>}
 	 * 
 	 * @param lineOfText Text to parse.
 	 * @throws ParseException If lineOfText violates expected format.
