@@ -45,7 +45,7 @@ public class GraphQLFile {
 	 * @return True if there are more lines to read, false otherwise.
 	 */
 	public boolean hasMoreLines() {
-		if (linesOfText != null && currentLineNumber < linesOfText.size()) {
+		if (linesOfText != null && currentLineNumber < linesOfText.size() - 1) {
 			return true;
 		}
 		return false;

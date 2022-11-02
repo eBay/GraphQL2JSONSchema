@@ -54,7 +54,7 @@ public class GraphQLParser {
 			return graphQLSchemaFiles;
 		}
 		
-		File[] files = directory.listFiles();
+		File[] files = directory.listFiles(new GraphQLFilenameFilter());
 		if (files != null) {
 			for (File file : files) {
 				if (file.isDirectory()) {
