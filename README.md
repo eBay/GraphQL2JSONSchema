@@ -1,5 +1,7 @@
 # GraphQL 2 JSON Schema
-Java library for converting GraphQL Schema to JSON Schema.
+Java library for converting GraphQL Schema to JSON Schema.  
+
+[Maven Central](https://central.sonatype.dev/artifact/com.ebay.nst/graphql-to-jsonschema/1.0.3/versions)
 
 ## Overview
 To enable GraphQL schema for contract verification testing we need a way to leverage GraphQL schemas with the JSON schema validator used in many validation tools. This library provides that translation capability.
