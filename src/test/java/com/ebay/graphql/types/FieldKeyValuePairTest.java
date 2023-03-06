@@ -63,4 +63,23 @@ public class FieldKeyValuePairTest {
 		assertThat(line, pair.getKey(), is(equalTo(expectedKey)));
 		assertThat(line, pair.getValue(), is(equalTo(expectedType)));
 	}
+
+	@DataProvider(name = "getNonNullableLegalKeyValuePairs")
+	public Object[][] getNonNullableLegalKeyValuePairs() {
+		return new Object[][] {
+				{ " key:Int!" },
+				{ " key:Boolean!" },
+				{ " key:Float!" },
+				{ " key:ID!" },
+				{ " key:String!" },
+				{ " key:CustomType!" },
+				{ " key:[String]!" }
+		};
+	}
+
+	@Test(dataProvider = "getNonNullableLegalKeyValuePairs")
+	public void nonNullableLegalKeyValuePairs(String line) throws ParseException {
+		FieldKeyValuePair pair = new FieldKeyValuePair(line);
+		assertThat(pair.getValue().isNullable(), is(equalTo(false)));
+	}
 }

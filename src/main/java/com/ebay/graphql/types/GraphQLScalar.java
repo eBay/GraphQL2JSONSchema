@@ -40,6 +40,12 @@ public class GraphQLScalar implements GraphQLType {
 	
 	public GraphQLScalar(String value) {
 		Objects.requireNonNull(value, "GrapyhQLScalar may not be initialized to null.");
+
+		if (value.trim().endsWith("!")) {
+			nullable = false;
+			value = value.substring(0, value.length()-1);
+		}
+
 		this.value = GraphQLScalarValue.getScalarValueFromString(value);
 		if (this.value == null) {
 			throw new IllegalArgumentException(String.format("Value %s does not match a known scalar type.", value));

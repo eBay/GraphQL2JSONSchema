@@ -315,13 +315,19 @@ public class GraphQLParserTest {
 		
 		GraphQLSchema fifthSchema = new GraphQLSchema();
 		fifthSchema.addQuery("translate(fromLanguage: Language, toLanguage: Language, text: String)", new GraphQLScalar(GraphQLScalarValue.STRING));
-		
-		return new Object[][] {
-			{ Arrays.asList("type Query {", "\"\"\"", "Translates a string from a give language into a different language.", "\"\"\"", "\ttranslate(", "\t\t\"The original language that 'text' is provided in.\"", "\t\tfromLanguage: Language", "", "\t\t\"The translated language to be returned.\"", "\t\ttoLanguage: Language", "", "\t\t\"The text to be translated.\"", "\t\ttext: String", "\t): String", "}"), firstSchema },
-			{ Arrays.asList("type Query {", "\"\"\"", "Translates a string from a give language into a different language.", "\"\"\"", "\ttranslate(", "\t\t\"The original language that 'text' is provided in.\"", "\t\tfromLanguage: Language", "", "\t\t\"The translated language to be returned.\"", "\t\ttoLanguage: Language", "", "\t\t\"The text to be translated.\"", "\t\ttext: String", "\t): UUID", "}"), secondSchema },
-			{ Arrays.asList("type Query {", "\tgetText: ID", "}"), thirdSchema },
-			{ Arrays.asList("type Query {", "\tgetText: ID", "\tgetVersion: String", "\tisLive: Boolean", "\tgetAccount: Account", "}"), fourthSchema },
-			{ Arrays.asList("type Query {", "\ttranslate(fromLanguage: Language, toLanguage: Language, text: String): String", "}"), fifthSchema },
+
+		GraphQLSchema nonNullableSchema = new GraphQLSchema();
+		GraphQLReference nonNullableReference = new GraphQLReference("CustomType");
+		nonNullableReference.makeNonNullable();
+		nonNullableSchema.addQuery("translate(fromLanguage: Language, toLanguage: Language, text: String)", nonNullableReference);
+
+		return new Object[][]{
+				{Arrays.asList("type Query {", "\"\"\"", "Translates a string from a give language into a different language.", "\"\"\"", "\ttranslate(", "\t\t\"The original language that 'text' is provided in.\"", "\t\tfromLanguage: Language", "", "\t\t\"The translated language to be returned.\"", "\t\ttoLanguage: Language", "", "\t\t\"The text to be translated.\"", "\t\ttext: String", "\t): String", "}"), firstSchema},
+				{Arrays.asList("type Query {", "\"\"\"", "Translates a string from a give language into a different language.", "\"\"\"", "\ttranslate(", "\t\t\"The original language that 'text' is provided in.\"", "\t\tfromLanguage: Language", "", "\t\t\"The translated language to be returned.\"", "\t\ttoLanguage: Language", "", "\t\t\"The text to be translated.\"", "\t\ttext: String", "\t): UUID", "}"), secondSchema},
+				{Arrays.asList("type Query {", "\tgetText: ID", "}"), thirdSchema},
+				{Arrays.asList("type Query {", "\tgetText: ID", "\tgetVersion: String", "\tisLive: Boolean", "\tgetAccount: Account", "}"), fourthSchema},
+				{Arrays.asList("type Query {", "\ttranslate(fromLanguage: Language, toLanguage: Language, text: String): String", "}"), fifthSchema},
+				{Arrays.asList("type Query {", "\ttranslate(fromLanguage: Language, toLanguage: Language, text: String): CustomType!", "}"), nonNullableSchema}
 		};
 	}
 	

@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.ebay.nst</groupId>
 	<artifactId>graphql-to-jsonschema</artifactId>
-	<version>1.1.1</version>
+	<version>1.1.2</version>
 	<name>GraphQL 2 JSON Schema</name>
 	<description>Converts GraphQL schema to JSON schema.</description>
 	<url>https://github.com/eBay/GraphQL2JSONSchema</url>

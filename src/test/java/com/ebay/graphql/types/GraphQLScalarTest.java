@@ -67,4 +67,10 @@ public class GraphQLScalarTest {
 		String value = null;
 		new GraphQLScalar(value);
 	}
+
+	@Test
+	public void nonNullableValueParsing() throws Exception {
+		GraphQLScalar scalar = new GraphQLScalar("Boolean!");
+		assertThat(scalar.isNullable(), is(equalTo(false)));
+	}
 }
