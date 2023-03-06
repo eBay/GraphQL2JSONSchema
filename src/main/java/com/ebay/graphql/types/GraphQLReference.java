@@ -10,6 +10,12 @@ public class GraphQLReference implements GraphQLType {
 	private boolean nullable = true;
 
 	public GraphQLReference(String referenceTypeName) {
+
+		if (referenceTypeName.trim().endsWith("!")) {
+			nullable = false;
+			referenceTypeName = referenceTypeName.substring(0, referenceTypeName.length()-1);
+		}
+
 		this.referenceTypeName = referenceTypeName.trim();
 	}
 

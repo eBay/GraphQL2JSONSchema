@@ -30,4 +30,10 @@ public class GraphQLReferenceTest {
 		assertThat(reference, is(equalTo(expectedReference)));
 		assertThat(reference.getReferenceTypeName(), is(equalTo(expectedReference.getReferenceTypeName())));
 	}
+
+	@Test
+	public void nonNullableValueParsing() throws Exception {
+		GraphQLReference reference = new GraphQLReference("CustomReferenceType!");
+		assertThat(reference.isNullable(), is(equalTo(false)));
+	}
 }
