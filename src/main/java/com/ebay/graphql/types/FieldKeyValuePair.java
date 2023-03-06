@@ -54,6 +54,10 @@ public class FieldKeyValuePair {
 		default:
 			throw new ParseException(String.format("Line of text [%s] is not parsable into a key value pair.", lineOfText), -1);
 		}
+
+		if (lineOfText.trim().endsWith("!")) {
+			value.makeNonNullable();
+		}
 		
 		// Extract the key
 		key = GraphQLParserUtil.getKeyForLine(lineOfText);
