@@ -1,17 +1,19 @@
 package com.ebay.graphql.transformer;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.ebay.graphql.parser.GraphQLParser;
+import org.hamcrest.Matchers;
 import org.mockito.Mockito;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -803,6 +805,31 @@ public class GraphQLToJsonSchemaTest {
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void unknownSubscription() throws Exception {
 		graphQLToJsonSchema.convertSubscription("FOO");
+	}
+
+	@Test
+	public void parseNonNullableResponseTypeAndGetTypeWithNonNullableSignature() throws IOException, URISyntaxException {
+
+		GraphQLParser parser = new GraphQLParser();
+
+		File file = getGraphQLResourceFile("com/ebay/graphql/nullableOperation/nonNullableOperation.graphqls");
+		GraphQLSchema actualSchema = parser.parseGraphQL(file);
+
+		// Schema query and mutation MUST be populated
+		Map<String, GraphQLType> queries = actualSchema.getQuerys();
+		assertThat("Query results MUST NOT be empty.", queries.isEmpty(), is(equalTo(false)));
+		graphQLToJsonSchema = new GraphQLToJsonSchema(actualSchema);
+		JsonNode rootNode = graphQLToJsonSchema.convertQuery("getPreference(input: GetPrefInput!)");
+		assertThat(rootNode, is(notNullValue()));
+		JsonNode typeNodeRaw = rootNode.get("type");
+		assertThat(typeNodeRaw, Matchers.is(Matchers.instanceOf(TextNode.class)));
+		TextNode typeNode = (TextNode) typeNodeRaw;
+		assertThat(typeNode.asText(), is(equalTo("object")));
+	}
+
+	private File getGraphQLResourceFile(String resource) throws IOException, URISyntaxException {
+		URL url = this.getClass().getClassLoader().getResource(resource);
+		return new File(url.toURI());
 	}
 	
 	private JsonNode loadResourceFile(String resource) throws URISyntaxException, IOException {

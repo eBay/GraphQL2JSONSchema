@@ -1,0 +1,15 @@
+"Query root"
+type Query {
+getPreference(input: GetPrefInput!): Preference!
+}
+
+"Preference to retrieve."
+input GetPrefInput {
+id: String
+}
+
+"Preference data"
+type Preference {
+id: String
+name: String
+}
