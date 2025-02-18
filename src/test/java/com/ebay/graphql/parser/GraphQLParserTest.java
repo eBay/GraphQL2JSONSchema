@@ -1,8 +1,8 @@
 package com.ebay.graphql.parser;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
+import static org.testng.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,7 +12,9 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
+import org.hamcrest.Matchers;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -291,8 +293,9 @@ public class GraphQLParserTest {
 	@Test(dataProvider = "extractOperationAPIValues")
 	public void parseOperationAPIValues(List<String> lines, FieldKeyValuePair expected) throws ParseException {
 		GraphQLFile graphQLFile = getGraphQLFile(lines);
-		FieldKeyValuePair actualPair = parser.extractOperationApi(graphQLFile);
-		assertThat(actualPair, is(equalTo(expected)));
+		Optional<FieldKeyValuePair> actualPair = parser.extractOperationApi(graphQLFile);
+		assertTrue(actualPair.isPresent());
+		assertThat(actualPair.get(), is(equalTo(expected)));
 	}
 
 	@DataProvider(name = "parseQueryValues")
@@ -553,6 +556,13 @@ public class GraphQLParserTest {
 
 		assertThat("Query results MUST NOT be empty.", querys.isEmpty(), is(equalTo(false)));
 		assertThat("Mutation results MUST NOT be empty.", mutations.isEmpty(), is(equalTo(false)));
+	}
+
+	@Test
+	public void smeSchema() throws Exception {
+		File file = getGraphQLResourceFile("com/ebay/graphql/erroreval/MultipleMutations.graphqls");
+		GraphQLSchema actualSchema = parser.parseGraphQL(file);
+		assertThat(actualSchema, is(notNullValue()));
 	}
 
 	// -------------------------------------------

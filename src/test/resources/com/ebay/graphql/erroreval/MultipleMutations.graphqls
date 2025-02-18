@@ -1,0 +1,50 @@
+extend type Mutation {
+    # external
+    "Pre-enroll"
+    preEnroll: PreEnrollmentOutput
+    # external
+    "Complete enrollment"
+    completeEnrollment(completeInput: CompleteInput): EnrollmentOutput
+    # internal
+    "Un-enrolling enrollment"
+    unEnroll: EnrollmentStatusOutput
+}
+
+"${inherit}"
+scalar DateTime
+"${inherit}"
+scalar Decimal
+
+"""
+Scalar type for void.
+This scalar type is used to clearly indicate that a field will not be assigned a useful value.
+"""
+scalar Void
+
+type Mutation {
+    """
+    Mutation operation to create entry event
+    """
+    createEntryEvent(
+        input: CreateEntryEventInput
+    ): CreateEntryEventOutput
+
+    """
+    Mutation operation to copy entry.
+    It creates a draft entry with the same details as the original entry, and returns the copied entry.
+    If the original entry cannot be found or is invalid, an error response is returned.
+    """
+    copyEntry(
+        input: CopyEntryInput!
+    ): CopyEntryOutput
+
+    """
+    Mutation operation for deleting multiple entries at once.
+    This operation may result in partial success, where some entries are deleted successfully while others fail.
+    It provides detailed results for each entry deletion attempt, allowing you to see which entries were successful or failed.
+    """
+    bulkDeleteEntries(
+        input: BulkDeleteEntriesInput!
+    ): BulkDeleteEntriesOutput
+
+}

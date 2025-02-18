@@ -4,6 +4,7 @@ import java.io.File;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import com.ebay.graphql.model.GraphQLSchema;
@@ -211,11 +212,14 @@ public class GraphQLParser {
 
 	protected final void processQuery(GraphQLFile graphQLFile, GraphQLSchema schema) throws ParseException {
 
-		FieldKeyValuePair kvp;
+		Optional<FieldKeyValuePair> kvp;
 		String line = graphQLFile.getCurrentLine();
 		while (GraphQLMatcher.getLineType(line) != LineType.CLOSING_CURLY_BRACE && line != null) {
 			kvp = extractOperationApi(graphQLFile);
-			schema.addQuery(kvp.getKey(), kvp.getValue());
+			if (!kvp.isPresent()) {
+				continue;
+			}
+			schema.addQuery(kvp.get().getKey(), kvp.get().getValue());
 			line = graphQLFile.peekNextLine();
 		}
 	}
@@ -228,11 +232,15 @@ public class GraphQLParser {
 
 	protected final void processMutation(GraphQLFile graphQLFile, GraphQLSchema schema) throws ParseException {
 
-		FieldKeyValuePair kvp;
+		Optional<FieldKeyValuePair> kvp;
 		String line = graphQLFile.getCurrentLine();
 		while (GraphQLMatcher.getLineType(line) != LineType.CLOSING_CURLY_BRACE && line != null) {
 			kvp = extractOperationApi(graphQLFile);
-			schema.addMutation(kvp.getKey(), kvp.getValue());
+			if (!kvp.isPresent()) {
+				line = graphQLFile.peekNextLine();
+				continue;
+			}
+			schema.addMutation(kvp.get().getKey(), kvp.get().getValue());
 			line = graphQLFile.peekNextLine();
 		}
 	}
@@ -245,11 +253,14 @@ public class GraphQLParser {
 
 	protected final void processSubscription(GraphQLFile graphQLFile, GraphQLSchema schema) throws ParseException {
 
-		FieldKeyValuePair kvp;
+		Optional<FieldKeyValuePair> kvp;
 		String line = graphQLFile.getCurrentLine();
 		while (GraphQLMatcher.getLineType(line) != LineType.CLOSING_CURLY_BRACE && line != null) {
 			kvp = extractOperationApi(graphQLFile);
-			schema.addSubscription(kvp.getKey(), kvp.getValue());
+			if (!kvp.isPresent()) {
+				continue;
+			}
+			schema.addSubscription(kvp.get().getKey(), kvp.get().getValue());
 			line = graphQLFile.peekNextLine();
 		}
 	}
@@ -371,7 +382,7 @@ public class GraphQLParser {
 		schema.addType(enumName, graphQLEnum);
 	}
 
-	protected final FieldKeyValuePair extractOperationApi(GraphQLFile graphQLFile) throws ParseException {
+	protected final Optional<FieldKeyValuePair> extractOperationApi(GraphQLFile graphQLFile) throws ParseException {
 
 		/*
 		 * Operation APIs can take on two forms:
@@ -389,8 +400,8 @@ public class GraphQLParser {
 		while (GraphQLMatcher.getLineType(line = graphQLFile.getNextLine()) != LineType.CLOSING_CURLY_BRACE
 				&& line != null) {
 
-			// Skip the line that is the opening definition for a schema definition.
-			if (line.contains("{")) {
+			// Skip the line that is the opening definition for a schema definition, and empty lines.
+			if (line.contains("{") || line.isEmpty()) {
 				continue;
 			}
 
@@ -431,7 +442,11 @@ public class GraphQLParser {
 			}
 		}
 
-		return new FieldKeyValuePair(queryBuilder.toString());
+		if (queryBuilder.length() == 0) {
+			return Optional.empty();
+		}
+
+		return Optional.of(new FieldKeyValuePair(queryBuilder.toString()));
 	}
 
 	private boolean canIgnoreLine(String line) {
