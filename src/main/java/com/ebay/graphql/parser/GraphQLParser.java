@@ -269,6 +269,7 @@ public class GraphQLParser {
 		
 		currentLine = currentLine.replaceFirst("^\\s*type\\s", "");
 		currentLine = currentLine.replace("{", "");
+		currentLine = currentLine.replaceAll("(@.*)\\s*$", "");
 
 		// Drop the interface if it exists
 		if (currentLine.contains(IMPLEMENTS_KEYWORD)) {
@@ -299,10 +300,16 @@ public class GraphQLParser {
 
 			line = line.trim();
 
+			if (line.contains("@")) {
+				line = line.replaceAll("(@.*)\\s*$", "");
+			}
+
 			if (line.endsWith("!")) {
 				nullable = false;
 				line = line.substring(0, line.length() - 1);
 			}
+
+			line = line.trim();
 
 			kvp = new FieldKeyValuePair(line);
 			GraphQLType value = kvp.getValue();

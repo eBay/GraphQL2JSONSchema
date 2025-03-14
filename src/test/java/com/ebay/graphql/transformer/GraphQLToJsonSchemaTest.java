@@ -47,6 +47,19 @@ public class GraphQLToJsonSchemaTest {
 	}
 
 	@Test
+	public void convertPolyglotCaseWithoutError() throws Exception {
+		GraphQLParser parser = new GraphQLParser();
+		File file = getGraphQLResourceFile("com/ebay/graphql/polyglotError/PolyglotException.graphqls");
+		GraphQLSchema actualSchema = parser.parseGraphQL(file);
+
+		graphQLToJsonSchema = new GraphQLToJsonSchema(actualSchema);
+		JsonNode actualNode = graphQLToJsonSchema.convertQuery("DisSpecifications(input: SpecificationInput!)");
+		JsonNode expectedNode = loadResourceFile("/com/ebay/graphql/transformer/polyglotException.json");
+
+		assertThat(actualNode, is(equalTo(expectedNode)));
+	}
+
+	@Test
 	public void enumWithoutValues() throws Exception {
 		
 		GraphQLEnum graphQLEnum = new GraphQLEnum();

@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.hamcrest.Matchers;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -562,7 +561,113 @@ public class GraphQLParserTest {
 	public void smeSchema() throws Exception {
 		File file = getGraphQLResourceFile("com/ebay/graphql/erroreval/MultipleMutations.graphqls");
 		GraphQLSchema actualSchema = parser.parseGraphQL(file);
-		assertThat(actualSchema, is(notNullValue()));
+
+		// Define the expected parsed schema
+		GraphQLSchema expectedSchema = new GraphQLSchema();
+
+		GraphQLReference preEnroll = new GraphQLReference("PreEnrollmentOutput");
+		expectedSchema.addMutation("preEnroll", preEnroll);
+
+		GraphQLReference completeEnrollment = new GraphQLReference("EnrollmentOutput");
+		expectedSchema.addMutation("completeEnrollment(completeInput: CompleteInput)", completeEnrollment);
+
+		GraphQLReference unEnroll = new GraphQLReference("EnrollmentStatusOutput");
+		expectedSchema.addMutation("unEnroll", unEnroll);
+
+		GraphQLReference createEntryEventInput = new GraphQLReference("CreateEntryEventOutput");
+		expectedSchema.addMutation("createEntryEvent( input: CreateEntryEventInput )", createEntryEventInput);
+
+		GraphQLReference copyEntryOutput = new GraphQLReference("CopyEntryOutput");
+		expectedSchema.addMutation("copyEntry( input: CopyEntryInput! )", copyEntryOutput);
+
+		GraphQLReference bulkDeleteEntries = new GraphQLReference("BulkDeleteEntriesOutput");
+		expectedSchema.addMutation("bulkDeleteEntries( input: BulkDeleteEntriesInput! )", bulkDeleteEntries);
+
+		GraphQLScalar dateTime = new GraphQLScalar(GraphQLScalarValue.STRING);
+		expectedSchema.addType("DateTime", dateTime);
+
+		GraphQLScalar decimal = new GraphQLScalar(GraphQLScalarValue.STRING);
+		expectedSchema.addType("Decimal", decimal);
+
+		GraphQLScalar voidScalar = new GraphQLScalar(GraphQLScalarValue.STRING);
+		expectedSchema.addType("Void", voidScalar);
+
+		// Compare
+		assertThat(actualSchema, is(equalTo(expectedSchema)));
+	}
+
+	@Test
+	public void polyglotExceptionSchema() throws Exception {
+		File file = getGraphQLResourceFile("com/ebay/graphql/polyglotError/PolyglotException.graphqls");
+		GraphQLSchema actualSchema = parser.parseGraphQL(file);
+
+		// Define the expected parsed schema
+		GraphQLSchema expectedSchema = new GraphQLSchema();
+		GraphQLReference disSpecificationOutput = new GraphQLReference("DisSpecificationOutput");
+		disSpecificationOutput.makeNonNullable();
+		expectedSchema.addQuery("DisSpecifications(input: SpecificationInput!)", disSpecificationOutput);
+
+		GraphQLScalar dateTime = new GraphQLScalar(GraphQLScalarValue.STRING);
+		expectedSchema.addType("DateTime", dateTime);
+
+		GraphQLScalar decimal = new GraphQLScalar(GraphQLScalarValue.STRING);
+		expectedSchema.addType("Decimal", decimal);
+
+		GraphQLObject disSpecificationOutputType = new GraphQLObject();
+		GraphQLReference disSpecificationField = new GraphQLReference("DisSpecification");
+		disSpecificationOutputType.addField("disSpecification", disSpecificationField);
+		expectedSchema.addType("DisSpecificationOutput", disSpecificationOutputType);
+
+		GraphQLObject disSpecificationType = new GraphQLObject();
+		GraphQLReference percentageOffField = new GraphQLReference("Decimal");
+		disSpecificationType.addField("percentageOff", percentageOffField);
+		GraphQLReference inCriteriaField = new GraphQLReference("InCriteria");
+		disSpecificationType.addField("inCriteria", inCriteriaField);
+		GraphQLReference paginationField = new GraphQLReference("Pagination");
+		disSpecificationType.addField("pagination", paginationField);
+		expectedSchema.addType("DisSpecification", disSpecificationType);
+
+		GraphQLObject inCriteriaType = new GraphQLObject();
+		GraphQLReference typeField = new GraphQLReference("CriteriaType");
+		typeField.makeNonNullable();
+		inCriteriaType.addField("type", typeField);
+		GraphQLList listingsField = new GraphQLList(new GraphQLReference("ProListing"), Dimensionality.SINGLE);
+		listingsField.makeNonNullable();
+		inCriteriaType.addField("listings", listingsField);
+		expectedSchema.addType("InCriteria", inCriteriaType);
+
+		GraphQLObject proListingType = new GraphQLObject();
+		GraphQLReference listingField = new GraphQLReference("Listing");
+		listingField.makeNonNullable();
+		proListingType.addField("listing", listingField);
+		expectedSchema.addType("ProListing", proListingType);
+
+		GraphQLObject listingType = new GraphQLObject();
+		GraphQLScalar idField = new GraphQLScalar(GraphQLScalarValue.ID);
+		idField.makeNonNullable();
+		listingType.addField("id", idField);
+		GraphQLReference statusField = new GraphQLReference("Status");
+		statusField.makeNonNullable();
+		listingType.addField("status", statusField);
+		expectedSchema.addType("Listing", listingType);
+
+		GraphQLObject paginationType = new GraphQLObject();
+		GraphQLScalar nextCursorField = new GraphQLScalar(GraphQLScalarValue.STRING);
+		paginationType.addField("nextCursor", nextCursorField);
+		expectedSchema.addType("Pagination", paginationType);
+
+		GraphQLEnum criteriaTypeEnum = new GraphQLEnum();
+		criteriaTypeEnum.addEnumValue("TYPE1");
+		criteriaTypeEnum.addEnumValue("TYPE2");
+		expectedSchema.addType("CriteriaType", criteriaTypeEnum);
+
+		GraphQLEnum statusEnum = new GraphQLEnum();
+		statusEnum.addEnumValue("ACTIVE");
+		statusEnum.addEnumValue("INACTIVE");
+		expectedSchema.addType("Status", statusEnum);
+
+		// Compare
+		assertThat(actualSchema, is(equalTo(expectedSchema)));
 	}
 
 	// -------------------------------------------

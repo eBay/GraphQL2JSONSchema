@@ -108,6 +108,7 @@ public class GraphQLMatcherTest {
 			
 			// SCALAR_INT
 			{ "foo: Int", LineType.FIELD_INT },
+			{ "foo: Int @external", LineType.FIELD_INT },
 			{ "Int: Int", LineType.FIELD_INT },
 			{ " foo: Int", LineType.FIELD_INT },
 			{ "		foo: Int", LineType.FIELD_INT },
@@ -123,6 +124,7 @@ public class GraphQLMatcherTest {
 			
 			// FIELD_INT
 			{ "foo: Int!", LineType.FIELD_INT },
+			{ "foo: Int! @external", LineType.FIELD_INT },
 			{ "Int: Int!", LineType.FIELD_INT },
 			{ " foo: Int!", LineType.FIELD_INT },
 			{ "		foo: Int!", LineType.FIELD_INT },
@@ -138,6 +140,7 @@ public class GraphQLMatcherTest {
 			
 			// SCALAR_FLOAT
 			{ "foo: Float", LineType.FIELD_FLOAT },
+			{ "foo: Float @external", LineType.FIELD_FLOAT },
 			{ "Float: Float", LineType.FIELD_FLOAT },
 			{ " foo: Float", LineType.FIELD_FLOAT },
 			{ "		foo: Float", LineType.FIELD_FLOAT },
@@ -153,6 +156,7 @@ public class GraphQLMatcherTest {
 			
 			// SCALAR_FLOAT_NON_NULLABLE
 			{ "foo: Float!", LineType.FIELD_FLOAT },
+			{ "foo: Float! @external", LineType.FIELD_FLOAT },
 			{ "Float: Float!", LineType.FIELD_FLOAT },
 			{ " foo: Float!", LineType.FIELD_FLOAT },
 			{ "		foo: Float!", LineType.FIELD_FLOAT },
@@ -168,6 +172,7 @@ public class GraphQLMatcherTest {
 			
 			// SCALAR_STRING
 			{ "foo: String", LineType.FIELD_STRING },
+			{ "foo: String @external", LineType.FIELD_STRING },
 			{ "String: String", LineType.FIELD_STRING },
 			{ " foo: String", LineType.FIELD_STRING },
 			{ "		foo: String", LineType.FIELD_STRING },
@@ -183,6 +188,7 @@ public class GraphQLMatcherTest {
 			
 			// FIELD_STRING
 			{ "foo: String!", LineType.FIELD_STRING },
+			{ "foo: String! @external", LineType.FIELD_STRING },
 			{ "String: String!", LineType.FIELD_STRING },
 			{ " foo: String!", LineType.FIELD_STRING },
 			{ "		foo: String!", LineType.FIELD_STRING },
@@ -198,6 +204,7 @@ public class GraphQLMatcherTest {
 			
 			// SCALAR_BOOLEAN
 			{ "foo: Boolean", LineType.FIELD_BOOLEAN },
+			{ "foo: Boolean @external", LineType.FIELD_BOOLEAN },
 			{ "Boolean: Boolean", LineType.FIELD_BOOLEAN },
 			{ " foo: Boolean", LineType.FIELD_BOOLEAN },
 			{ "		foo: Boolean", LineType.FIELD_BOOLEAN },
@@ -213,6 +220,7 @@ public class GraphQLMatcherTest {
 			
 			// FIELD_BOOLEAN
 			{ "foo: Boolean!", LineType.FIELD_BOOLEAN },
+			{ "foo: Boolean! @external", LineType.FIELD_BOOLEAN },
 			{ "Boolean: Boolean!", LineType.FIELD_BOOLEAN },
 			{ " foo: Boolean!", LineType.FIELD_BOOLEAN },
 			{ "		foo: Boolean!", LineType.FIELD_BOOLEAN },
@@ -228,6 +236,7 @@ public class GraphQLMatcherTest {
 			
 			// FIELD_ID
 			{ "foo: ID", LineType.FIELD_ID },
+			{ "foo: ID @external", LineType.FIELD_ID },
 			{ "ID: ID", LineType.FIELD_ID },
 			{ " foo: ID", LineType.FIELD_ID },
 			{ "		foo: ID", LineType.FIELD_ID },
@@ -244,6 +253,7 @@ public class GraphQLMatcherTest {
 			// FIELD_ID
 			{ "foo: ID!", LineType.FIELD_ID },
 			{ "ID: ID!", LineType.FIELD_ID },
+			{ "ID: ID! @external", LineType.FIELD_ID },
 			{ " foo: ID!", LineType.FIELD_ID },
 			{ "		foo: ID!", LineType.FIELD_ID },
 			{ "foo: ID! ", LineType.FIELD_ID },
@@ -258,6 +268,8 @@ public class GraphQLMatcherTest {
 			
 			// FIELD_REFERENCE
 			{ "foo: uu_ID", LineType.FIELD_REFERENCE },
+			{ "foo: uu_ID @external", LineType.FIELD_REFERENCE },
+			{ "foo: uu_ID! @external", LineType.FIELD_REFERENCE },
 			{ "foo: _UUID", LineType.FIELD_REFERENCE },
 			{ "foo: _uu_id", LineType.FIELD_REFERENCE },
 			{ "foo: URL", LineType.FIELD_REFERENCE },
@@ -288,6 +300,9 @@ public class GraphQLMatcherTest {
 			{ "type Person implements Name {", LineType.OBJECT_DEFINITION },
 			{ "type Person implements Name & Age {", LineType.OBJECT_DEFINITION },
 			{ "type Person implements Name{", LineType.OBJECT_DEFINITION },
+			{ "type DisSpecification @shareable {", LineType.OBJECT_DEFINITION },
+			{ "type ProListing @key(fields: \"listing { id }\") {", LineType.OBJECT_DEFINITION },
+			{ "type Listing @extends @key(fields: \"id status\") {", LineType.OBJECT_DEFINITION },
 			
 			// SCALAR_DEFINITION
 			{ "scalar UUID", LineType.SCALAR_DEFINITION },
