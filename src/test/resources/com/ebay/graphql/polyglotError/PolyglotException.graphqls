@@ -1,0 +1,70 @@
+# Define custom scalar types
+scalar DateTime
+scalar Decimal
+
+# Define custom directives
+directive @key(fields: String!) repeatable on OBJECT | INTERFACE
+directive @shareable on OBJECT | FIELD_DEFINITION
+directive @extends on OBJECT | INTERFACE
+directive @external on FIELD_DEFINITION
+
+# Base Query type
+type Query {
+    DisSpecifications(input: SpecificationInput!): DisSpecificationOutput!
+}
+
+# Types
+type DisSpecificationOutput @shareable {
+    disSpecification: DisSpecification
+}
+
+type DisSpecification @shareable {
+    percentageOff: Decimal
+    inCriteria: InCriteria
+    pagination: Pagination
+}
+
+type InCriteria @shareable {
+    type: CriteriaType!
+    listings: [ProListing]!
+}
+
+type ProListing @key(fields: "listing { id }") {
+    listing: Listing!
+}
+
+type Listing @extends @key(fields: "id status") {
+    id: ID! @external
+    status: Status! @external
+}
+
+type Pagination @shareable {
+    nextCursor: String
+}
+
+# Inputs
+input SpecificationInput {
+    id: ID!
+    queryCriteria: CriteriaInput!
+}
+
+input CriteriaInput {
+    listingPageInfoInput: PageInfoInput!
+    discountId: ID!
+}
+
+input PageInfoInput {
+    pageCursor: String
+    maxPageSize: Int!
+}
+
+# Enums
+enum CriteriaType {
+    TYPE1
+    TYPE2
+}
+
+enum Status {
+    ACTIVE
+    INACTIVE
+}

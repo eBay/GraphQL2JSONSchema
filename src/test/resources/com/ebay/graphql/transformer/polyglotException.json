@@ -1,0 +1,48 @@
+{
+  "type" : "object",
+  "properties" : {
+    "disSpecification" : {
+      "type" : [ "object", "null" ],
+      "properties" : {
+        "pagination" : {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "nextCursor" : {
+              "type" : [ "string", "null" ]
+            }
+          }
+        },
+        "percentageOff" : {
+          "type" : [ "string", "null" ]
+        },
+        "inCriteria" : {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "listings" : {
+              "type" : "array",
+              "items" : {
+                "type" : [ "object", "null" ],
+                "properties" : {
+                  "listing" : {
+                    "type" : "object",
+                    "properties" : {
+                      "id" : {
+                        "type" : "string"
+                      },
+                      "status" : {
+                        "enum" : [ "ACTIVE", "INACTIVE" ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "type" : {
+              "enum" : [ "TYPE1", "TYPE2" ]
+            }
+          }
+        }
+      }
+    }
+  }
+}
